@@ -62,7 +62,7 @@ export default defineConfig({
           'Content-Type': 'application/json'
         }
       },
-      testMatch: 'tests/integration/**/*.spec.ts',
+      testMatch: 'tests/api/**/*.spec.ts',
     },
     {
       name: 'Exhibitor Tests',

@@ -1,7 +1,7 @@
 import { test, expect, request } from '@playwright/test';
 import * as fs from 'fs/promises';
 import { createEntry, deleteEntry } from '../../utils/api/api';
-import { sessionTemplate, userTemplate } from '../../fixtures/api/apiRequestBodies';
+import { sessionTemplate } from '../../fixtures/api/apiRequestBodies';
 
 const apiBase = process.env.API_BASE_URL || 'https://api.fliplet.com/v1';
 const token = process.env.FLIPLET_API_TOKEN;
