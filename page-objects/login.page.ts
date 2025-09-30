@@ -1,4 +1,4 @@
-// page-objects/login.page.ts
+ // page-objects/login.page.ts
 
 import { type Page, type Locator, expect } from '@playwright/test';
 import { BasePage } from './base.page';

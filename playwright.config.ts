@@ -24,6 +24,10 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,  
     trace: 'on-first-retry',
+    extraHTTPHeaders: {
+      'Authorization': `Bearer ${process.env.FLIPLET_API_TOKEN}`,
+      'Content-Type': 'application/json'
+    }
   },
 
   projects: [
@@ -48,6 +52,17 @@ export default defineConfig({
       dependencies: ['setup'],
       use: { storageState: ATTENDEE_STORAGE_STATE },
       testMatch: 'tests/user/**/*.spec.ts',
+    },
+    {
+      name: 'API',
+      use: {
+        baseURL: process.env.API_BASE_URL,
+        extraHTTPHeaders: {
+          'Authorization': `Bearer ${process.env.FLIPLET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      },
+      testMatch: 'tests/integration/**/*.spec.ts',
     },
     {
       name: 'Exhibitor Tests',
