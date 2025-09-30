@@ -1,4 +1,8 @@
 import { test, expect, request } from '@playwright/test';
+// This spec exercises Fliplet Data Sources API:
+// 1) Insert an Agenda entry using a payload fixture
+// 2) Persist the created ID to a file for standalone delete runs
+// 3) Delete the entry, logging a simple ID-only message; treat 404 as already deleted
 import * as fs from 'fs/promises';
 import { createEntry, deleteEntry } from '../../utils/api/api';
 import { sessionTemplate } from '../../fixtures/api/apiRequestBodies';
@@ -21,6 +25,7 @@ const token = process.env.FLIPLET_API_TOKEN;
     });
   };
 
+  // Arrange, Act, Assert: Insert Agenda event and persist its ID
   test('Insert Agenda event', async () => {
     if (!token) throw new Error('FLIPLET_API_TOKEN not set');
     const dsAgenda = process.env.AGENDA_DS;
@@ -35,6 +40,7 @@ const token = process.env.FLIPLET_API_TOKEN;
     await fs.writeFile('test-results/last-agenda-entry-id.txt', String(entryId), 'utf8');
   });
 
+  // Arrange, Act, Assert: Delete Agenda entry if present (supports standalone run)
   test('Delete Agenda entry', async () => {
     if (!token) throw new Error('FLIPLET_API_TOKEN not set');
     let idToDelete = entryId;

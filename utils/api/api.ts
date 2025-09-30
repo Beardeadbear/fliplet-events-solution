@@ -1,5 +1,19 @@
 import { APIRequestContext } from '@playwright/test';
 
+/**
+ * Creates a new entry in a Fliplet Data Source.
+ *
+ * Endpoint: PUT /v1/data-sources/:dataSourceId/data
+ * - If API_BASE_URL ends with /v1/data-sources/, this helper uses a
+ *   relative path like `${dataSourceId}/data`.
+ * - Otherwise ensure the full path is `/data-sources/${dataSourceId}/data`.
+ *
+ * @param apiContext Playwright APIRequestContext with Bearer token
+ * @param dataSourceId Data Source ID
+ * @param payload Entry data (keys must match DS columns)
+ * @returns Created entry ID
+ */
+
 // Utility to create a new entry in a given Data Source
 export async function createEntry(
   apiContext: APIRequestContext,
@@ -22,6 +36,12 @@ export async function createEntry(
 }
 
 // Utility to delete an entry from a given Data Source
+/**
+ * Deletes an existing entry in a Fliplet Data Source.
+ *
+ * Endpoint: DELETE /v1/data-sources/:dataSourceId/data/:entryId
+ * Path handling follows the same baseURL rule as createEntry.
+ */
 export async function deleteEntry(
   apiContext: APIRequestContext,
   dataSourceId: string,
