@@ -1,7 +1,8 @@
-// page-objects/login.page.ts
+ // page-objects/login.page.ts
 
 import { type Page, type Locator, expect } from '@playwright/test';
 import { BasePage } from './base.page';
+import { HomePage } from './home.page';
 
 /**
  * LoginPage represents the login screen with all its different states.
@@ -59,9 +60,9 @@ export class LoginPage extends BasePage {
     // ===========================================
     // LOGIN FORM ELEMENTS (MCP-extracted)
     // ===========================================
-    this.emailInput = page.locator('input[name="Email"]');
+    this.emailInput = page.getByRole('textbox', { name: 'Email' });
     this.passwordInput = page.locator('input[name="Password"]');
-    this.loginButton = page.locator('button:has-text("Log in")');
+    this.loginButton = page.getByRole('button', { name: 'Log in' });
     this.createAccountButton = page.locator('button.btn-signup').filter({ hasText: 'Create account' });
     this.forgotPasswordLink = page.locator('span.btn-forget-pass').filter({ hasText: 'Forgot your password?' });
     
@@ -113,12 +114,13 @@ export class LoginPage extends BasePage {
     await this.emailInput.waitFor({ state: 'visible' });
     await this.passwordInput.waitFor({ state: 'visible' });
     await this.loginButton.waitFor({ state: 'visible' });
-    
     await this.emailInput.fill(username);
     await this.passwordInput.fill(password);
-    await this.loginButton.click();
-    
+    await expect(this.loginButton).toBeEnabled();
+    await this.loginButton.click()
     await this.page.waitForLoadState('networkidle');
+    const homePage = new HomePage(this.page);
+    await homePage.waitForAuthenticatedUI();
   }
 
   /**

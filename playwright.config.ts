@@ -1,6 +1,7 @@
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
 import { BASE_URL } from './test-data/app.data';
+import { channel } from 'diagnostics_channel';
 
 // The teardown script is configured at the top level to run after all tests have finished.
 const globalTeardown = require.resolve('./global-setup/global-teardown');
@@ -35,7 +36,11 @@ export default defineConfig({
     {
       name: 'Auth Tests',
       // No dependencies on setup - runs with clean state
+      testDir: './tests/auth',
       testMatch: 'tests/auth/**/*.spec.ts',
+      use: {
+        channel: 'chrome',
+      },
     },
     {
       name: 'Admin Tests',
@@ -48,6 +53,17 @@ export default defineConfig({
       dependencies: ['setup'],
       use: { storageState: ATTENDEE_STORAGE_STATE },
       testMatch: 'tests/user/**/*.spec.ts',
+    },
+    {
+      name: 'API',
+      use: {
+        baseURL: process.env.API_BASE_URL,
+        extraHTTPHeaders: {
+          'Authorization': `Bearer ${process.env.FLIPLET_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      },
+      testMatch: 'tests/api/**/*.spec.ts',
     },
     {
       name: 'Exhibitor Tests',

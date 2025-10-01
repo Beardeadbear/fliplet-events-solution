@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../page-objects/login.page';
 import { OnboardingPage } from '../../page-objects/onboarding.page';
+import { HomePage } from '../../page-objects/home.page';
 import { 
   ADMIN_EMAIL, 
   ADMIN_PASSWORD, 
@@ -32,15 +33,14 @@ test.describe('Login Functionality', () => {
 
   test('LOGIN-TC-001: Successful Admin login', async ({ page }) => {
     await loginPage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    await expect(page).toHaveURL(/home/);
-    await expect(page.getByRole('heading').filter({ hasText: /Welcome/ })).toBeVisible();
+    const homePage = new HomePage(page);
+    await homePage.waitForAuthenticatedUI();
   });
-
-
+  
   test('LOGIN-TC-002: Successful Internal Member login', async ({ page }) => {
     await loginPage.login(ATTENDEE_EMAIL, ATTENDEE_PASSWORD);
-    await expect(page).toHaveURL(/home/);
-    await expect(page.getByRole('heading').filter({ hasText: /Welcome/ })).toBeVisible();
+    const homePage = new HomePage(page);
+    await homePage.waitForAuthenticatedUI();
   });
 
 
