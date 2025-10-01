@@ -1,5 +1,7 @@
 // global-setup/auth.setup.ts
 import { test as setup, expect, type Page } from '@playwright/test';
+import * as fs from 'fs/promises';
+import { sessionTemplate } from '../fixtures/api/apiRequestBodies';
 import { LoginPage } from '../page-objects/login.page';
 import { OnboardingPage } from '../page-objects/onboarding.page';
 import { ADMIN_EMAIL, ADMIN_PASSWORD, SPEAKER_EMAIL, SPEAKER_PASSWORD, ATTENDEE_EMAIL, ATTENDEE_PASSWORD, EXHIBITOR_EMAIL, EXHIBITOR_PASSWORD } from '../test-data/app.data';
@@ -47,5 +49,37 @@ setup.describe('Authentication Setup', () => {
     await expect(page.getByRole('button', { name: 'Check In' })).toBeVisible();
     await page.context().storageState({ path: EXHIBITOR_STORAGE_STATE });
     console.log('✅ Exhibitor authentication state saved');
+  });
+
+  // Seed: Insert Agenda entry via Fliplet REST API and persist its ID
+  setup('Seed: Insert Agenda entry', async ({ request }) => {
+    const apiBase = process.env.API_BASE_URL || 'https://api.fliplet.com/v1';
+    const token = process.env.FLIPLET_API_TOKEN;
+    const dsAgenda = process.env.AGENDA_DS;
+
+    if (!token || !dsAgenda) {
+      console.warn('Skipping Agenda seed: missing FLIPLET_API_TOKEN or AGENDA_DS');
+      return;
+    }
+
+    const api = await request.newContext({
+      baseURL: apiBase,
+      extraHTTPHeaders: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const res = await api.put(`/data-sources/${dsAgenda}/data`, { data: sessionTemplate });
+    if (!res.ok()) {
+      throw new Error(`Seed insert failed: HTTP ${res.status()} - ${await res.text()}`);
+    }
+    const body: any = await res.json();
+    const id: number = Array.isArray(body) ? body[0]?.id : body?.id;
+    if (!id) throw new Error('Seed insert did not return an entry ID');
+
+    await fs.mkdir('test-results', { recursive: true });
+    await fs.writeFile('test-results/last-agenda-entry-id.txt', String(id), 'utf8');
+    console.log('✅ Seeded Agenda entry ID:', id);
   });
 });  
