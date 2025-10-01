@@ -114,6 +114,27 @@ export class HomePage extends BasePage {
   }
 
   /**
+   * Waits for a reliable signal that the authenticated Home UI is loaded.
+   * Tries multiple stable, role-based targets to avoid flakiness across builds.
+   */
+  async waitForAuthenticatedUI(): Promise<void> {
+    await this.page.waitForLoadState('networkidle');
+    try {
+      await this.eventTitle.waitFor({ state: 'visible', timeout: 10000 });
+      return;
+    } catch {}
+    try {
+      await this.navigationMenu.bottomNavigation.waitFor({ state: 'visible', timeout: 10000 });
+      return;
+    } catch {}
+    try {
+      await this.checkInButton.waitFor({ state: 'visible', timeout: 10000 });
+      return;
+    } catch {}
+    throw new Error('Authenticated UI did not appear: event title, bottom navigation, or Check In button not visible.');
+  }
+
+  /**
    * Navigate to the app root - will redirect to Home if user is logged in
    */
   async goto(): Promise<void> {

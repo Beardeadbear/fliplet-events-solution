@@ -1,7 +1,5 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import fetch from 'node-fetch';
-
 // This script runs once after all tests have completed to clean up artifacts
 // like authentication state files. This ensures each full test execution is independent.
 
@@ -32,13 +30,13 @@ async function globalTeardown() {
 
     if (Number.isFinite(entryId) && token && dsAgenda) {
       const url = `${apiBase}/data-sources/${dsAgenda}/data/${entryId}`;
-      const res = await fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } } as any);
-      if (res.ok) {
+      const res = await (globalThis as any).fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } } as any);
+      if (res && res.ok) {
         console.log(`Seeded Agenda entry deleted: ${entryId}`);
-      } else if (res.status === 404) {
+      } else if (res && res.status === 404) {
         console.log(`Seeded Agenda entry ${entryId} not found; already removed.`);
       } else {
-        console.warn(`Failed to delete seeded entry ${entryId}: HTTP ${res.status}`);
+        console.warn(`Failed to delete seeded entry ${entryId}: HTTP ${res ? res.status : 'no-response'}`);
       }
     }
   } catch {
