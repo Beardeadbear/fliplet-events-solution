@@ -114,98 +114,161 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Waits for a reliable signal that the authenticated Home UI is loaded.
-   * Tries multiple stable, role-based targets to avoid flakiness across builds.
-   */
-  async waitForAuthenticatedUI(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
-    try {
-      await this.eventTitle.waitFor({ state: 'visible', timeout: 10000 });
-      return;
-    } catch {}
-    try {
-      await this.navigationMenu.bottomNavigation.waitFor({ state: 'visible', timeout: 10000 });
-      return;
-    } catch {}
-    try {
-      await this.checkInButton.waitFor({ state: 'visible', timeout: 10000 });
-      return;
-    } catch {}
-    throw new Error('Authenticated UI did not appear: event title, bottom navigation, or Check In button not visible.');
-  }
-
-  /**
-   * Navigate to the app root - will redirect to Home if user is logged in
-   */
-  async goto(): Promise<void> {
-    await this.page.goto(BASE_URL);
-  }
-
-  /**
-   * Wait for the Home page to load completely
+   * Wait for the Home page to load completely by checking key UI elements.
+   * 
+   * This method ensures the core Home page elements are visible before proceeding:
+   * - Event title (confirms we're on the right event)
+   * - Welcome message (confirms user is authenticated)
+   * - Check In button (confirms main functionality is available)
+   * 
+   * @example
+   * ```ts
+   * await homePage.waitForPageLoad();
+   * // Now safe to interact with Home page elements
+   * ```
    */
   async waitForPageLoad(): Promise<void> {
     await this.eventTitle.waitFor({ state: 'visible' });
     await this.welcomeMessage.waitFor({ state: 'visible' });
     await this.checkInButton.waitFor({ state: 'visible' });
-    
-    // Handle push notifications if they appear during page load
-    await this.handlePushNotifications();
   }
-
   /**
-   * Handle push notification popup if it appears
+   * Handle push notification popup if it appears on the Home page.
+   * 
+   * This method detects and dismisses the browser push notification permission dialog
+   * that may appear after login. It uses scoped selectors within the popup to avoid
+   * clicking wrong buttons elsewhere on the page.
+   * 
+   * @param action - Which button to click: 'allow', 'dont-allow', or 'remind-later'
+   * @default 'allow'
+   * 
+   * @example
+   * ```ts
+   * // Allow notifications (default)
+   * await homePage.handlePushNotifications();
+   * 
+   * // Explicitly deny notifications
+   * await homePage.handlePushNotifications('dont-allow');
+   * 
+   * // Postpone the decision
+   * await homePage.handlePushNotifications('remind-later');
+   * ```
    */
   async handlePushNotifications(action: 'allow' | 'dont-allow' | 'remind-later' = 'allow'): Promise<void> {
+    const popup = this.pushNotificationPopup;
+
+    // Try to detect the popup becoming visible briefly
+    const appeared = await popup
+      .waitFor({ state: 'visible', timeout: 4000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!appeared) {
+      // No popup to handle
+      return;
+    }
+
+    // Scope buttons to the popup to avoid accidental matches elsewhere
+    const allowBtn = popup.getByRole('button', { name: 'Allow notifications' });
+    const dontAllowBtn = popup.getByRole('button', { name: "Don't allow" });
+    const remindBtn = popup.getByRole('button', { name: 'Remind me later' });
+
     try {
-      // Check if push notification popup is visible
-      const isPopupVisible = await this.pushNotificationPopup.isVisible();
-      
-      if (isPopupVisible) {
-        switch (action) {
-          case 'allow':
-            await this.allowNotificationsButton.click();
+      switch (action) {
+        case 'allow':
+          if (await allowBtn.isVisible()) {
+            await allowBtn.click();
             break;
-          case 'dont-allow':
-            await this.dontAllowNotificationsButton.click();
+          }
+          // Fallback to other options if preferred one is not visible
+          if (await dontAllowBtn.isVisible()) { await dontAllowBtn.click(); break; }
+          if (await remindBtn.isVisible()) { await remindBtn.click(); break; }
+          break;
+        case 'dont-allow':
+          if (await dontAllowBtn.isVisible()) {
+            await dontAllowBtn.click();
             break;
-          case 'remind-later':
-            await this.remindMeLaterButton.click();
+          }
+          if (await allowBtn.isVisible()) { await allowBtn.click(); break; }
+          if (await remindBtn.isVisible()) { await remindBtn.click(); break; }
+          break;
+        case 'remind-later':
+          if (await remindBtn.isVisible()) {
+            await remindBtn.click();
             break;
-        }
-        
-        // Wait for popup to disappear
-        await this.pushNotificationPopup.waitFor({ state: 'hidden' });
+          }
+          if (await dontAllowBtn.isVisible()) { await dontAllowBtn.click(); break; }
+          if (await allowBtn.isVisible()) { await allowBtn.click(); break; }
+          break;
       }
-    } catch (error) {
-      // If popup is not visible or already handled, continue
-      console.log('Push notification popup not visible or already handled');
+    } finally {
+      // Ensure we wait for the popup to be gone, but don't fail the flow if it lingers
+      await popup.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
     }
   }
 
   /**
-   * Allow push notifications (default action)
+   * Allow push notifications - convenience method for handlePushNotifications('allow').
+   * 
+   * This is a shorthand for clicking "Allow notifications" on the permission dialog.
+   * Use this when you want to explicitly allow notifications in your test.
+   * 
+   * @example
+   * ```ts
+   * await homePage.allowPushNotifications();
+   * // Equivalent to: await homePage.handlePushNotifications('allow');
+   * ```
    */
   async allowPushNotifications(): Promise<void> {
     await this.handlePushNotifications('allow');
   }
 
   /**
-   * Don't allow push notifications
+   * Don't allow push notifications - convenience method for handlePushNotifications('dont-allow').
+   * 
+   * This is a shorthand for clicking "Don't allow" on the permission dialog.
+   * Use this when you want to explicitly deny notifications in your test.
+   * 
+   * @example
+   * ```ts
+   * await homePage.dontAllowPushNotifications();
+   * // Equivalent to: await homePage.handlePushNotifications('dont-allow');
+   * ```
    */
   async dontAllowPushNotifications(): Promise<void> {
     await this.handlePushNotifications('dont-allow');
   }
 
   /**
-   * Remind me later for push notifications
+   * Remind me later for push notifications - convenience method for handlePushNotifications('remind-later').
+   * 
+   * This is a shorthand for clicking "Remind me later" on the permission dialog.
+   * Use this when you want to postpone the notification decision in your test.
+   * 
+   * @example
+   * ```ts
+   * await homePage.remindMeLaterPushNotifications();
+   * // Equivalent to: await homePage.handlePushNotifications('remind-later');
+   * ```
    */
   async remindMeLaterPushNotifications(): Promise<void> {
     await this.handlePushNotifications('remind-later');
   }
 
   /**
-   * Check if push notification popup is visible
+   * Check if push notification popup is currently visible on the page.
+   * 
+   * This method returns a boolean indicating whether the notification permission
+   * dialog is present. Useful for conditional logic in tests.
+   * 
+   * @returns Promise<boolean> - true if popup is visible, false otherwise
+   * 
+   * @example
+   * ```ts
+   * if (await homePage.isPushNotificationPopupVisible()) {
+   *   await homePage.dontAllowPushNotifications();
+   * }
+   * ```
    */
   async isPushNotificationPopupVisible(): Promise<boolean> {
     return await this.pushNotificationPopup.isVisible();
@@ -214,7 +277,17 @@ export class HomePage extends BasePage {
 
 
   /**
-   * Click the Check In button to generate QR code
+   * Click the Check In button to generate QR code for event check-in.
+   * 
+   * This method handles the main check-in functionality. It automatically handles
+   * any push notification popup that might appear before clicking the button.
+   * After clicking, a QR code modal should appear for scanning.
+   * 
+   * @example
+   * ```ts
+   * await homePage.clickCheckIn();
+   * // QR code modal should now be visible
+   * ```
    */
   async clickCheckIn(): Promise<void> {
     // Handle push notifications first if they appear
@@ -223,7 +296,19 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Click on a specific agenda item by index
+   * Click on a specific agenda item by its index position.
+   * 
+   * This method clicks on an agenda/session item from the upcoming sessions list.
+   * The index is 0-based, so first item is index 0, second is index 1, etc.
+   * Clicking an agenda item typically opens a detail overlay with session information.
+   * 
+   * @param index - Zero-based index of the agenda item to click
+   * 
+   * @example
+   * ```ts
+   * await homePage.clickAgendaItem(0); // Click first agenda item
+   * await homePage.clickAgendaItem(2); // Click third agenda item
+   * ```
    */
   async clickAgendaItem(index: number): Promise<void> {
     const agendaItem = this.agendaItems.nth(index);
@@ -231,7 +316,17 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Click the See More button to view all sessions
+   * Click the "See More" button to expand the upcoming sessions list.
+   * 
+   * This method clicks the button that expands the agenda/sessions list to show
+   * more items beyond the initially visible ones. Useful for testing pagination
+   * or expanding content functionality.
+   * 
+   * @example
+   * ```ts
+   * await homePage.clickSeeMore();
+   * // More agenda items should now be visible
+   * ```
    */
   async clickSeeMore(): Promise<void> {
     await this.seeMoreButton.click();
@@ -244,7 +339,23 @@ export class HomePage extends BasePage {
 
 
   /**
-   * Verify the Home page is loaded correctly
+   * Verify the Home page is loaded correctly by checking all key elements.
+   * 
+   * This method performs comprehensive validation that the Home page has loaded
+   * successfully. It checks for:
+   * - Event title visibility
+   * - Welcome message presence
+   * - Check In button availability
+   * - Upcoming sessions section
+   * - Navigation menu loaded state
+   * 
+   * Use this for assertions in tests to ensure the page is fully functional.
+   * 
+   * @example
+   * ```ts
+   * await homePage.verifyHomePageLoaded();
+   * // All key Home page elements are confirmed visible
+   * ```
    */
   async verifyHomePageLoaded(): Promise<void> {
     await expect(this.eventTitle).toBeVisible();
@@ -255,7 +366,18 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Verify user is logged in by checking welcome message
+   * Verify user is logged in by checking the user name element.
+   * 
+   * This method validates that a user is properly authenticated by checking
+   * that the userName element contains actual user data (not the default
+   * placeholder "John Doe"). This confirms the login was successful and
+   * user data is loaded.
+   * 
+   * @example
+   * ```ts
+   * await homePage.verifyUserLoggedIn();
+   * // Confirms user is authenticated with real data
+   * ```
    */
   async verifyUserLoggedIn(): Promise<void> {
     const userName = await this.userName.textContent();

@@ -28,9 +28,33 @@ export const sessionTemplate = {
     Role: "Speaker"
   };
 
-
   export const materialTemplate = {
-    Name: "Jane Doe",
-    Email: "jane@example.com",
-    Role: "Speaker"
+    Name: "Presentation Slides",
+    Type: "PDF",
+    Description: "Comprehensive presentation covering all topics",
+    URL: "https://example.com/slides.pdf",
+    SessionId: null, // Will be set when creating material for specific session
+    FileSize: "2.5MB",
+    UploadDate: "2025-01-01",
+    IsPublic: true
+  };
+
+  export const commentTemplate = {
+    Content: "Great presentation! Very informative.",
+    SessionId: null, // Will be set when creating comment for specific session
+    UserId: null, // Will be set when creating comment for specific user
+    CreatedAt: new Date().toISOString(),
+    IsPublic: true,
+    ParentCommentId: null // For replies
+  };
+
+  export const surveyResponseTemplate = {
+    SessionId: null, // Will be set when creating response for specific session
+    UserId: null, // Will be set when creating response for specific user
+    Question1: "How would you rate this session?",
+    Answer1: "5 - Excellent",
+    Question2: "What did you learn?",
+    Answer2: "A lot about the topic",
+    SubmittedAt: new Date().toISOString(),
+    Rating: 5
   };

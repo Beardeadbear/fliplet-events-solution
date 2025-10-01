@@ -25,6 +25,7 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,  
     trace: 'on-first-retry',
+    headless: true,  // Ensure browsers close automatically
   },
 
   projects: [

@@ -120,7 +120,7 @@ export class LoginPage extends BasePage {
     await this.loginButton.click()
     await this.page.waitForLoadState('networkidle');
     const homePage = new HomePage(this.page);
-    await homePage.waitForAuthenticatedUI();
+    await homePage.waitForPageLoad();
   }
 
   /**

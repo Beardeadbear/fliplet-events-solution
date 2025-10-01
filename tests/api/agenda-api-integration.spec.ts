@@ -4,7 +4,7 @@ import { test, expect, request } from '@playwright/test';
 // 2) Persist the created ID to a file for standalone delete runs
 // 3) Delete the entry, logging a simple ID-only message; treat 404 as already deleted
 import * as fs from 'fs/promises';
-import { createEntry, deleteEntry } from '../../utils/api/api';
+import { FlipletAPIClient } from '../../helpers/data/flipletApiClient';
 import { sessionTemplate } from '../../fixtures/api/apiRequestBodies';
 
 const apiBase = process.env.API_BASE_URL || 'https://api.fliplet.com/v1';
@@ -12,6 +12,7 @@ const token = process.env.FLIPLET_API_TOKEN;
 
  test.describe.serial('Insert and delete Agenda entry', () => {
   let entryId: number | undefined;
+  let api: FlipletAPIClient;
 
   // SoC/DRY: centralize API context creation
   const createApiContext = async () => {
@@ -25,15 +26,14 @@ const token = process.env.FLIPLET_API_TOKEN;
     });
   };
 
+  test.beforeAll(async () => {
+    const apiContext = await createApiContext();
+    api = new FlipletAPIClient(apiContext);
+  });
+
   // Arrange, Act, Assert: Insert Agenda event and persist its ID
   test('Insert Agenda event', async () => {
-    if (!token) throw new Error('FLIPLET_API_TOKEN not set');
-    const dsAgenda = process.env.AGENDA_DS;
-    if (!dsAgenda) throw new Error('AGENDA_DS not set');
-
-    const apiContext = await createApiContext();
-
-    entryId = await createEntry(apiContext, dsAgenda, sessionTemplate);
+    entryId = await api.agenda.createSession(sessionTemplate);
     expect(entryId).toBeGreaterThan(0);
     console.log('Created event entry ID:', entryId);
     await fs.mkdir('test-results', { recursive: true });
@@ -42,7 +42,6 @@ const token = process.env.FLIPLET_API_TOKEN;
 
   // Arrange, Act, Assert: Delete Agenda entry if present (supports standalone run)
   test('Delete Agenda entry', async () => {
-    if (!token) throw new Error('FLIPLET_API_TOKEN not set');
     let idToDelete = entryId;
     if (!idToDelete) {
       try {
@@ -53,13 +52,8 @@ const token = process.env.FLIPLET_API_TOKEN;
     }
     if (!idToDelete) throw new Error('Entry ID not set. Run insert test first.');
 
-    const dsAgenda = process.env.AGENDA_DS;
-    if (!dsAgenda) throw new Error('AGENDA_DS not set');
-
-    const apiContext = await createApiContext();
-
     try {
-      await deleteEntry(apiContext, dsAgenda, idToDelete);
+      await api.agenda.deleteSession(idToDelete);
       console.log('Deleted entry ID:', idToDelete);
     } catch (e) {
       const msg = String(e);

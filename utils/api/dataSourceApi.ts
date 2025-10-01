@@ -13,8 +13,6 @@ import { APIRequestContext } from '@playwright/test';
  * @param payload Entry data (keys must match DS columns)
  * @returns Created entry ID
  */
-
-// Utility to create a new entry in a given Data Source
 export async function createEntry(
   apiContext: APIRequestContext,
   dataSourceId: string,
@@ -35,7 +33,6 @@ export async function createEntry(
   return id as number;
 }
 
-// Utility to delete an entry from a given Data Source
 /**
  * Deletes an existing entry in a Fliplet Data Source.
  *

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../page-objects/login.page';
 import { OnboardingPage } from '../../page-objects/onboarding.page';
 import { HomePage } from '../../page-objects/home.page';
+import { loginAsAdmin, loginAsAttendee } from '../../helpers/auth/login';
 import { 
   ADMIN_EMAIL, 
   ADMIN_PASSWORD, 
@@ -20,6 +21,7 @@ import {
  */
 test.describe('Login Functionality', () => {
   let loginPage: LoginPage;
+  let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
     // Before each test, we must complete the onboarding flow to reach the login page.
@@ -29,18 +31,15 @@ test.describe('Login Functionality', () => {
     
     // The application should now be on the login page. We just need to instantiate it.
     loginPage = new LoginPage(page);
+    homePage = new HomePage(page);
   });
 
   test('LOGIN-TC-001: Successful Admin login', async ({ page }) => {
-    await loginPage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-    const homePage = new HomePage(page);
-    await homePage.waitForAuthenticatedUI();
+    await loginAsAdmin(page);
   });
   
   test('LOGIN-TC-002: Successful Internal Member login', async ({ page }) => {
-    await loginPage.login(ATTENDEE_EMAIL, ATTENDEE_PASSWORD);
-    const homePage = new HomePage(page);
-    await homePage.waitForAuthenticatedUI();
+    await loginAsAttendee(page);
   });
 
 

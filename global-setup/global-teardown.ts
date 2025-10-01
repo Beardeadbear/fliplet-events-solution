@@ -1,5 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { request } from '@playwright/test';
+import { FlipletAPIClient } from '../helpers/data/flipletApiClient';
 // This script runs once after all tests have completed to clean up artifacts
 // like authentication state files. This ensures each full test execution is independent.
 
@@ -20,28 +22,48 @@ async function globalTeardown() {
     console.error('Error during global teardown:', error);
   }
 
-  // Cleanup: Delete seeded Agenda entry if present
+  // Cleanup: Delete seeded Agenda entry if present (using same approach as working test)
   try {
-    const idTxt = await fs.readFile(path.resolve(__dirname, '..', 'test-results/last-agenda-entry-id.txt'), 'utf8');
+    const filePath = path.resolve(__dirname, '..', 'test-results/last-agenda-entry-id.txt');
+    const idTxt = await fs.readFile(filePath, 'utf8');
     const entryId = Number(String(idTxt).trim());
     const apiBase = process.env.API_BASE_URL || 'https://api.fliplet.com/v1';
     const token = process.env.FLIPLET_API_TOKEN;
-    const dsAgenda = process.env.AGENDA_DS;
 
-    if (Number.isFinite(entryId) && token && dsAgenda) {
-      const url = `${apiBase}/data-sources/${dsAgenda}/data/${entryId}`;
-      const res = await (globalThis as any).fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } } as any);
-      if (res && res.ok) {
+    if (Number.isFinite(entryId) && token) {
+      console.log(`Attempting to delete seeded Agenda entry: ${entryId}`);
+      
+      // Use the same API context creation as the working test
+      const apiContext = await request.newContext({
+        baseURL: apiBase,
+        extraHTTPHeaders: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const api = new FlipletAPIClient(apiContext);
+
+      try {
+        await api.agenda.deleteSession(entryId);
         console.log(`Seeded Agenda entry deleted: ${entryId}`);
-      } else if (res && res.status === 404) {
-        console.log(`Seeded Agenda entry ${entryId} not found; already removed.`);
-      } else {
-        console.warn(`Failed to delete seeded entry ${entryId}: HTTP ${res ? res.status : 'no-response'}`);
+      } catch (e) {
+        const msg = String(e);
+        if (msg.includes('HTTP 404')) {
+          console.log(`Entry ${entryId} not found; considered already deleted.`);
+        } else {
+          console.warn(`API error deleting seeded entry ${entryId}:`, e);
+        }
+      } finally {
+        await apiContext.dispose();
       }
+    } else {
+      console.log('Skipping Agenda entry deletion: missing entryId or token');
     }
-  } catch {
-    // ignore if file missing or deletion fails silently
+  } catch (fileError) {
+    console.log('No seeded Agenda entry file found or file read error');
   }
+  
   console.log('--- Global Teardown Complete ---');
 }
 
