@@ -38,9 +38,6 @@ export default defineConfig({
       // No dependencies on setup - runs with clean state
       testDir: './tests/auth',
       testMatch: 'tests/auth/**/*.spec.ts',
-      use: {
-        channel: 'chrome',
-      },
     },
     {
       name: 'Admin Tests',
