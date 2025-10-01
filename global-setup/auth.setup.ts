@@ -24,33 +24,29 @@ setup.describe('Authentication Setup', () => {
 
     // No need to call loginPage.goto() - onboarding leaves us on login page
     await loginPage.login(user.username!, user.password!);
-    await homePage.waitForAuthenticatedUI();
+    await homePage.waitForPageLoad();
   };
 
   setup('Log in as Admin', async ({ page }) => {
     await loginAs(page, { username: ADMIN_EMAIL, password: ADMIN_PASSWORD });
-    await new HomePage(page).waitForAuthenticatedUI();
     await page.context().storageState({ path: ADMIN_STORAGE_STATE });
     console.log('✅ Admin authentication state saved');
   });
 
   setup('Log in as Speaker', async ({ page }) => {
     await loginAs(page, { username: SPEAKER_EMAIL, password: SPEAKER_PASSWORD });
-    await new HomePage(page).waitForAuthenticatedUI();
     await page.context().storageState({ path: SPEAKER_STORAGE_STATE });
     console.log('✅ Speaker authentication state saved');
   });
 
   setup('Log in as Attendee', async ({ page }) => {
     await loginAs(page, { username: ATTENDEE_EMAIL, password: ATTENDEE_PASSWORD });
-    await new HomePage(page).waitForAuthenticatedUI();
     await page.context().storageState({ path: ATTENDEE_STORAGE_STATE });
     console.log('✅ Attendee authentication state saved');
   });
 
   setup('Log in as Exhibitor', async ({ page }) => {
     await loginAs(page, { username: EXHIBITOR_EMAIL, password: EXHIBITOR_PASSWORD });
-    await new HomePage(page).waitForAuthenticatedUI();
     await page.context().storageState({ path: EXHIBITOR_STORAGE_STATE });
     console.log('✅ Exhibitor authentication state saved');
   });
