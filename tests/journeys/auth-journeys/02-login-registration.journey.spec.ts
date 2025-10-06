@@ -2,10 +2,7 @@
  * FLOW-AUTH-002: Login & Registration
  * Priority: P0
  * Dependencies: FLOW-AUTH-001
- * 
- * User Story:
- * As a user, I want to login with my credentials OR register a new account
- * from the Login screen so I can access the app.
+ * Est. Tests: 4 journey scenarios
  * 
  * Test Cases: GEN-LOGIN-001 to 004, GEN-REGISTRATION-001 to 007
  */
@@ -14,132 +11,98 @@ import { test, expect } from '@playwright/test';
 
 test.describe('FLOW-AUTH-002: Login & Registration', () => {
   
-  test.describe('Login Flow', () => {
-    
-    test('GEN-LOGIN-001 - User is able to login with valid credentials', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Login screen
-      // 2. Enter valid email
-      // 3. Enter valid password
-      // 4. Tap "Login" button
-      // 5. Verify successful login
-      // 6. Verify redirect to Home screen
-      // 7. Verify user name displayed on Home
-    });
-
-    test('GEN-LOGIN-002 - User is able to reset password when clicking "Forgot password?"', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Login screen
-      // 2. Tap "Forgot password?" link
-      // 3. Verify "Reset Password" screen displayed
-      // 4. Enter registered email
-      // 5. Tap "Send Reset Link" button
-      // 6. Verify success message displayed
-      // 7. Verify email sent confirmation
-    });
-
-    test('GEN-LOGIN-003 - User is not able to login with invalid email', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Login screen
-      // 2. Enter invalid email format (e.g., "test@")
-      // 3. Enter any password
-      // 4. Tap "Login" button
-      // 5. Verify error message: "Invalid email format"
-      // 6. Verify user remains on Login screen
-    });
-
-    test('GEN-LOGIN-004 - User is not able to login with incorrect password', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Login screen
-      // 2. Enter valid registered email
-      // 3. Enter incorrect password
-      // 4. Tap "Login" button
-      // 5. Verify error message: "Invalid credentials"
-      // 6. Verify user remains on Login screen
-    });
-
+  test('Happy Path: Successful login → Navigate to Home', async ({ page }) => {
+    // TODO: Implement successful login journey
+    // 
+    // Step 1: Navigate to Login screen
+    // Step 2: Verify login form is visible
+    // Step 3: Enter valid email (validates: GEN-LOGIN-001)
+    // Step 4: Enter valid password
+    // Step 5: Click "Login" button
+    // Step 6: Verify loading indicator appears
+    // Step 7: Verify successful login (no error messages)
+    // Step 8: Verify redirect to Home screen
+    // Step 9: Verify personalized welcome message with user name
+    // Step 10: Verify session is persisted (auth token stored)
   });
 
-  test.describe('Registration Flow', () => {
-    
-    test('GEN-REGISTRATION-001 - User is able to register with valid data', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Login screen
-      // 2. Tap "Register" or "Sign Up" button
-      // 3. Verify Registration screen displayed
-      // 4. Fill all required fields (name, email, password)
-      // 5. Tap "Register" button
-      // 6. Verify success message
-      // 7. Verify redirect to Login screen
-    });
+  test('Error Scenarios: Invalid credentials and validation', async ({ page }) => {
+    // TODO: Implement error handling journey
+    // 
+    // INVALID EMAIL:
+    // Step 1: Navigate to Login screen
+    // Step 2: Enter invalid email format (e.g., "notanemail")
+    // Step 3: Enter password
+    // Step 4: Attempt to login (validates: GEN-LOGIN-003)
+    // Step 5: Verify validation error: "Invalid email format"
+    // Step 6: Verify user remains on Login screen
+    // 
+    // INCORRECT PASSWORD:
+    // Step 7: Enter valid email
+    // Step 8: Enter incorrect password
+    // Step 9: Click "Login" button (validates: GEN-LOGIN-004)
+    // Step 10: Verify error message: "Incorrect password"
+    // Step 11: Verify user remains on Login screen
+    // Step 12: Verify email field retains value
+    // Step 13: Verify password field is cleared
+  });
 
-    test('GEN-REGISTRATION-002 - User can generate bio content', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Registration screen
-      // 2. Fill required fields
-      // 3. Tap "Generate Bio" button (AI feature)
-      // 4. Verify bio content generated in bio field
-      // 5. Verify bio is editable
-      // 6. Complete registration
-    });
+  test('Forgot Password: Reset password flow', async ({ page }) => {
+    // TODO: Implement password reset journey
+    // 
+    // Step 1: Navigate to Login screen
+    // Step 2: Click "Forgot password?" link (validates: GEN-LOGIN-002)
+    // Step 3: Verify password reset screen opens
+    // Step 4: Enter email address
+    // Step 5: Click "Send Reset Link" button
+    // Step 6: Verify success message: "Reset link sent to your email"
+    // Step 7: Check email inbox (simulate or verify API call)
+    // Step 8: Click reset link from email
+    // Step 9: Verify password reset form opens
+    // Step 10: Enter new password
+    // Step 11: Confirm new password
+    // Step 12: Submit new password
+    // Step 13: Verify success message: "Password reset successful"
+    // Step 14: Verify redirect to Login screen
+    // Step 15: Login with new password
+    // Step 16: Verify successful login
+  });
 
-    test('GEN-REGISTRATION-003 - User can log in with new credentials after registration', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Complete registration flow
-      // 2. Verify redirect to Login screen
-      // 3. Enter newly registered email
-      // 4. Enter newly registered password
-      // 5. Tap "Login" button
-      // 6. Verify successful login
-      // 7. Verify redirect to Home screen
-    });
-
-    test('GEN-REGISTRATION-004 - User cannot register with all required fields empty', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Registration screen
-      // 2. Leave all required fields empty
-      // 3. Tap "Register" button
-      // 4. Verify validation error messages displayed
-      // 5. Verify "Name is required" error
-      // 6. Verify "Email is required" error
-      // 7. Verify "Password is required" error
-      // 8. Verify user remains on Registration screen
-    });
-
-    test('GEN-REGISTRATION-005 - User cannot register with invalid email address', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Registration screen
-      // 2. Enter valid name
-      // 3. Enter invalid email (e.g., "notanemail")
-      // 4. Enter valid password
-      // 5. Tap "Register" button
-      // 6. Verify error: "Invalid email format"
-      // 7. Verify user remains on Registration screen
-    });
-
-    test('GEN-REGISTRATION-006 - User cannot register with weak password', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Registration screen
-      // 2. Enter valid name
-      // 3. Enter valid email
-      // 4. Enter weak password (e.g., "123")
-      // 5. Tap "Register" button
-      // 6. Verify error: "Password must be at least 8 characters"
-      // 7. Verify user remains on Registration screen
-    });
-
-    test('GEN-REGISTRATION-007 - User cannot register with already-registered email', async ({ page }) => {
-      // TODO: Implement test
-      // 1. Navigate to Registration screen
-      // 2. Enter valid name
-      // 3. Enter email that's already registered
-      // 4. Enter valid password
-      // 5. Tap "Register" button
-      // 6. Verify error: "Email already registered"
-      // 7. Verify user remains on Registration screen
-    });
-
+  test('New User Registration: Create account → Auto-login → Home', async ({ page }) => {
+    // TODO: Implement user registration journey
+    // 
+    // Step 1: Navigate to Login screen
+    // Step 2: Click "Register" or "Create Account" link
+    // Step 3: Verify registration form opens
+    // Step 4: Enter valid data in all required fields (validates: GEN-REGISTRATION-001):
+    //    - First Name
+    //    - Last Name
+    //    - Email
+    //    - Password
+    //    - Confirm Password
+    // Step 5: Click "Register" button
+    // Step 6: Verify success message: "Account created successfully"
+    // Step 7: Verify auto-login (validates: GEN-REGISTRATION-003)
+    // Step 8: Verify redirect to Home screen
+    // Step 9: Verify welcome message with user name
+    // 
+    // VALIDATION TESTS:
+    // Step 10: Navigate back to registration
+    // Step 11: Leave all required fields empty
+    // Step 12: Attempt to register (validates: GEN-REGISTRATION-004)
+    // Step 13: Verify validation errors for all required fields
+    // 
+    // Step 14: Enter invalid email format
+    // Step 15: Attempt to register (validates: GEN-REGISTRATION-005)
+    // Step 16: Verify error: "Invalid email format"
+    // 
+    // Step 17: Enter weak password (e.g., "123")
+    // Step 18: Attempt to register (validates: GEN-REGISTRATION-006)
+    // Step 19: Verify error: "Password must be at least 8 characters"
+    // 
+    // Step 20: Enter email that's already registered
+    // Step 21: Attempt to register (validates: GEN-REGISTRATION-007)
+    // Step 22: Verify error: "Email already registered"
   });
 
 });
-
