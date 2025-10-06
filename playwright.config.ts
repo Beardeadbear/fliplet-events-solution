@@ -1,7 +1,7 @@
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
 import { BASE_URL } from './test-data/app.data';
-import { channel } from 'diagnostics_channel';
+
 
 // The teardown script is configured at the top level to run after all tests have finished.
 const globalTeardown = require.resolve('./global-setup/global-teardown');
@@ -25,7 +25,7 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,  
     trace: 'on-first-retry',
-    headless: true,  // Ensure browsers close automatically
+    //headless: true,  // Ensure browsers close automatically
   },
 
   projects: [
@@ -42,6 +42,10 @@ export default defineConfig({
       // No dependencies on setup - runs with clean state
       testDir: './tests/auth',
       testMatch: 'tests/auth/**/*.spec.ts',
+      workers: 1, // Force sequential execution
+      use: { 
+        storageState: undefined // Clear state between tests
+      },
     },
 
     // ========== JOURNEY TESTS (E2E) ==========
