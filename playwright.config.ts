@@ -1,7 +1,7 @@
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
 import { BASE_URL } from './test-data/app.data';
-import { channel } from 'diagnostics_channel';
+
 
 // The teardown script is configured at the top level to run after all tests have finished.
 const globalTeardown = require.resolve('./global-setup/global-teardown');
@@ -25,35 +25,100 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,  
     trace: 'on-first-retry',
-    headless: true,  // Ensure browsers close automatically
+    //headless: true,  // Ensure browsers close automatically
   },
 
   projects: [
+    // ========== SETUP PROJECT ==========
     {
       name: 'setup',
       testDir: './global-setup',
       testMatch: 'auth.setup.ts',
     },
+
+    // ========== AUTH MODULE TESTS ==========
     {
       name: 'Auth Tests',
       // No dependencies on setup - runs with clean state
       testDir: './tests/auth',
       testMatch: 'tests/auth/**/*.spec.ts',
+      workers: 1, // Force sequential execution
+      use: { 
+        storageState: undefined // Clear state between tests
+      },
+    },
+
+    // ========== JOURNEY TESTS (E2E) ==========
+    {
+      name: 'Journey: Auth',
+      dependencies: ['setup'],
+      testDir: './tests/journeys/auth-journeys',
+      testMatch: 'tests/journeys/auth-journeys/**/*.journey.spec.ts',
+      use: { 
+        storageState: ATTENDEE_STORAGE_STATE,
+        trace: 'on' // Always trace journeys
+      },
     },
     {
-      name: 'Admin Tests',
+      name: 'Journey: Attendee',
+      dependencies: ['setup'],
+      testDir: './tests/journeys/attendee-journeys',
+      testMatch: 'tests/journeys/attendee-journeys/**/*.journey.spec.ts',
+      use: { 
+        storageState: ATTENDEE_STORAGE_STATE,
+        trace: 'on'
+      },
+    },
+    {
+      name: 'Journey: Admin',
+      dependencies: ['setup'],
+      testDir: './tests/journeys/admin-journeys',
+      testMatch: 'tests/journeys/admin-journeys/**/*.journey.spec.ts',
+      use: { 
+        storageState: ADMIN_STORAGE_STATE,
+        trace: 'on'
+      },
+    },
+    {
+      name: 'Journey: Integration',
+      dependencies: ['setup'],
+      testDir: './tests/journeys/integration-journeys',
+      testMatch: 'tests/journeys/integration-journeys/**/*.journey.spec.ts',
+      use: { 
+        storageState: ADMIN_STORAGE_STATE, // Admin can do more
+        trace: 'on'
+      },
+    },
+
+    // ========== MODULE TESTS ==========
+    {
+      name: 'Admin Module Tests',
       dependencies: ['setup'],
       use: { storageState: ADMIN_STORAGE_STATE },
       testMatch: 'tests/admin/**/*.spec.ts',
     },
     {
-      name: 'Attendee Tests',
+      name: 'Attendee Module Tests',
       dependencies: ['setup'],
       use: { storageState: ATTENDEE_STORAGE_STATE },
       testMatch: 'tests/user/**/*.spec.ts',
     },
     {
-      name: 'API',
+      name: 'Exhibitor Tests',
+      dependencies: ['setup'],
+      use: { storageState: EXHIBITOR_STORAGE_STATE },
+      testMatch: 'tests/exhibitor/**/*.spec.ts',
+    },
+    {
+      name: 'Speaker Tests',
+      dependencies: ['setup'],
+      use: { storageState: SPEAKER_STORAGE_STATE },
+      testMatch: 'tests/speaker/**/*.spec.ts',
+    },
+
+    // ========== SPECIALIZED TESTS ==========
+    {
+      name: 'API Tests',
       use: {
         baseURL: process.env.API_BASE_URL,
         extraHTTPHeaders: {
@@ -64,16 +129,26 @@ export default defineConfig({
       testMatch: 'tests/api/**/*.spec.ts',
     },
     {
-      name: 'Exhibitor Tests',
+      name: 'RBAC Tests',
       dependencies: ['setup'],
-       use: { storageState: EXHIBITOR_STORAGE_STATE },
-      testMatch: 'tests/exhibitor/**/*.spec.ts',
+      use: { storageState: ATTENDEE_STORAGE_STATE },
+      testMatch: 'tests/rbac/**/*.spec.ts',
     },
     {
-      name: 'Speaker Tests',
+      name: 'Accessibility Tests',
       dependencies: ['setup'],
-      use: { storageState: SPEAKER_STORAGE_STATE },
-      testMatch: 'tests/speaker/**/*.spec.ts',
+      use: { storageState: ATTENDEE_STORAGE_STATE },
+      testMatch: 'tests/accessibility/**/*.spec.ts',
     },
-      ],
+    {
+      name: 'Performance Tests',
+      dependencies: ['setup'],
+      use: { 
+        storageState: ATTENDEE_STORAGE_STATE,
+        video: 'off', // Faster performance tests
+        screenshot: 'off'
+      },
+      testMatch: 'tests/performance/**/*.spec.ts',
+    },
+  ],
 }); 

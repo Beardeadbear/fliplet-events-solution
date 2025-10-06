@@ -2,7 +2,7 @@
 
 import { type Page, type Locator, expect } from '@playwright/test';
 import { BasePage } from './base.page';
-import { HomePage } from './home.page';
+
 
 /**
  * LoginPage represents the login screen with all its different states.
@@ -26,6 +26,7 @@ export class LoginPage extends BasePage {
   public readonly verificationCodeInput: Locator;
   public readonly newPasswordInput: Locator;
   public readonly confirmPasswordInput: Locator;
+  public readonly resetPasswordButton: Locator;
   
   // ===========================================
   // ERROR MESSAGE LOCATORS (MCP-extracted)
@@ -60,20 +61,21 @@ export class LoginPage extends BasePage {
     // ===========================================
     // LOGIN FORM ELEMENTS (MCP-extracted)
     // ===========================================
-    this.emailInput = page.getByRole('textbox', { name: 'Email' });
+    this.emailInput = page.locator('input[name="Email"]');
     this.passwordInput = page.locator('input[name="Password"]');
     this.loginButton = page.getByRole('button', { name: 'Log in' });
     this.createAccountButton = page.locator('button.btn-signup').filter({ hasText: 'Create account' });
-    this.forgotPasswordLink = page.locator('span.btn-forget-pass').filter({ hasText: 'Forgot your password?' });
+    this.forgotPasswordLink = page.getByText('Forgot your password?');
     
     // ===========================================
     // PASSWORD RESET FORM ELEMENTS (MCP-extracted)
     // ===========================================
-    this.resetEmailInput = page.locator('input.reset-email-field');
-    this.verifyEmailButton = page.locator('button.verify-identity').filter({ hasText: 'Verify email' });
-    this.verificationCodeInput = page.locator('input.pin-code-field');
-    this.newPasswordInput = page.locator('input.new-password');
-    this.confirmPasswordInput = page.locator('input.confirm-password');
+    this.resetEmailInput = page.locator('input[type="email"]').nth(1);
+    this.verifyEmailButton = page.getByRole('button', { name: 'Verify email' });
+    this.verificationCodeInput = page.getByRole('textbox', { name: 'Enter verification code' })
+    this.newPasswordInput = page.getByRole('textbox', { name: 'Enter your new password' })
+    this.confirmPasswordInput = page.getByRole('textbox', { name: 'Confirm your new password' })
+    this.resetPasswordButton = page.getByRole('button', { name: 'Reset password' })
     
     // ===========================================
     // ERROR MESSAGE LOCATORS (MCP-extracted)
@@ -111,28 +113,50 @@ export class LoginPage extends BasePage {
    * Performs complete login with username and password
    */
   async login(username: string, password: string): Promise<void> {
+    // Ensure page is fully loaded
+    await this.page.waitForLoadState('networkidle');
+    
     await this.emailInput.waitFor({ state: 'visible' });
     await this.passwordInput.waitFor({ state: 'visible' });
     await this.loginButton.waitFor({ state: 'visible' });
+    
+    // Clear any existing values first
+    await this.emailInput.clear();
+    await this.passwordInput.clear();
+    
+    // Fill credentials with explicit waits
     await this.emailInput.fill(username);
     await this.passwordInput.fill(password);
+    
+    // Verify fields are filled
+    await expect(this.emailInput).toHaveValue(username);
+    await expect(this.passwordInput).toHaveValue(password);
+    
+    // Wait for button to be enabled
     await expect(this.loginButton).toBeEnabled();
-    await this.loginButton.click()
-    await this.page.waitForLoadState('networkidle');
-    const homePage = new HomePage(this.page);
-    await homePage.waitForPageLoad();
+    
+    // Click and wait for navigation (simpler approach)
+    await Promise.all([
+      this.page.waitForURL(/home|dashboard|main/),
+      this.loginButton.click()
+    ]);
   }
 
   /**
    * Initiates password reset flow
    */
   async resetPassword(email: string): Promise<void> {
+    // First ensure we're in login form state, not password reset state
+    await this.page.reload();
+    await this.emailInput.waitFor({ state: 'visible' });
+    await this.passwordInput.waitFor({ state: 'visible' });
     await this.forgotPasswordLink.waitFor({ state: 'visible' });
+    
     await this.forgotPasswordLink.click();
+    await this.page.waitForLoadState('networkidle');
     
     await this.resetEmailInput.waitFor({ state: 'visible' });
     await this.verifyEmailButton.waitFor({ state: 'visible' });
-    
     await this.resetEmailInput.fill(email);
     await this.verifyEmailButton.click();
     await this.page.waitForLoadState('networkidle');
@@ -238,7 +262,20 @@ export class LoginPage extends BasePage {
    * Checks if currently in password reset state
    */
   async isInPasswordResetState(): Promise<boolean> {
-    return await this.resetEmailInput.isVisible() && await this.verifyEmailButton.isVisible();
+    try {
+      // Check if password reset form elements are visible
+      const resetEmailVisible = await this.resetEmailInput.isVisible();
+      const verifyButtonVisible = await this.verifyEmailButton.isVisible();
+      
+      // Also check if login form elements are hidden
+      const loginEmailHidden = !(await this.emailInput.isVisible());
+      const loginPasswordHidden = !(await this.passwordInput.isVisible());
+      
+      return resetEmailVisible && verifyButtonVisible && loginEmailHidden && loginPasswordHidden;
+    } catch (error) {
+      console.log('Error checking password reset state:', error);
+      return false;
+    }
   }
 
 

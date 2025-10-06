@@ -7,19 +7,19 @@ import { BASE_URL } from '../test-data/app.data';
  * Provides methods to interact with elements on the Onboarding page.
  */
 export class OnboardingPage extends BasePage {
-  // Define locators for all possible buttons in the flow
+  // Define locators for onboarding flow elements
   public readonly exploreMoreButton: Locator;
-  public readonly continueButtonOne: Locator;
-  public readonly continueButtonTwo: Locator;
+  public readonly slide4ContinueButton: Locator;
+  public readonly slide6ContinueButton: Locator;
   public readonly getStartedButton: Locator;
 
   constructor(page: Page) {
     super(page);
 
     this.exploreMoreButton = page.getByRole('button', { name: 'Explore More' });
-    this.continueButtonOne = page.getByLabel('Slide 4', { exact: true }).getByRole('button', { name: 'Continue' });
-    this.continueButtonTwo = page.getByLabel('Slide 6').getByText('Continue')
-    this.getStartedButton = page.getByText('Let\'s get started!')
+    this.slide4ContinueButton = page.getByLabel('Slide 4', { exact: true }).getByText('Continue');
+    this.slide6ContinueButton = page.getByLabel('Slide 6').getByText('Continue');
+    this.getStartedButton = page.getByText('Let\'s get started!');
   }
 
   /**
@@ -31,15 +31,18 @@ export class OnboardingPage extends BasePage {
   }
 
   /**
-   * Navigates to the page and completes the entire multi-step onboarding flow.
+   * Completes the onboarding flow by clicking through carousel slides.
    */
-  async completeOnboarding() {
-    // Wait for the first button to be ready before starting
-    await this.exploreMoreButton.waitFor({ state: 'visible' });
-    await this.exploreMoreButton.click();
-    await this.continueButtonOne.click();
-    await this.continueButtonTwo.click();
-    await this.getStartedButton.click();
-    await this.page.waitForLoadState('networkidle');
+  async completeOnboarding(): Promise<void> {
+    // Check if onboarding is needed (Explore More button exists)
+    if (await this.exploreMoreButton.isVisible()) {
+      await this.exploreMoreButton.click();
+      await this.slide4ContinueButton.click();
+      await this.slide6ContinueButton.click();
+      await this.getStartedButton.click();
+    }
+    
+    // Wait for login form to be ready
+    await this.page.getByRole('textbox', { name: 'Email' }).waitFor();  // Wait for login form to be ready
   }
 }
