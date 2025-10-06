@@ -8,7 +8,7 @@
 
 ## 📋 Complete User Journeys Table
 
-| Journey ID | Journey Name | Priority | Primary Role | Dependencies | Est. Tests | Screens Involved | Key Features to Automate | Test Cases |
+| Journey ID | Journey Name | Priority | Primary Role | Dependencies | Test Cases | Screens Involved | Key Features to Automate | Checklist IDs |
 |------------|--------------|----------|--------------|--------------|------------|------------------|--------------------------|------------|
 | **FLOW-AUTH-001** | Onboarding (First Launch) | **P0** | Attendee | None | 2 | - Onboarding | - Onboarding slides (swipe through)<br>- Shown only on first app launch<br>- Proceed to Login after completion | GEN-ONBOARDING-001, GEN-ONBOARDING-002 |
 | **FLOW-AUTH-002** | Login & Registration | **P0** | Attendee / Admin | FLOW-AUTH-001 | 11 | - Login<br>- Login - Forgot Password<br>- Registration<br>- Home | **Login:**<br>- Login with valid credentials<br>- Invalid credential errors<br>- Password reset flow<br>- Role-based redirect<br><br>**Registration:**<br>- Register from Login page<br>- Field validation (email, password)<br>- Duplicate email error<br>- Bio generation<br>- Return to Login after success | GEN-LOGIN-001 to 004, GEN-REGISTRATION-001 to 007 |
