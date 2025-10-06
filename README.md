@@ -1,15 +1,22 @@
 ## Fliplet Event – Playwright Test Suite
 
-End-to-end, journeys, RBAC, performance, and accessibility tests for the Fliplet Event app using Playwright.
+Comprehensive test automation framework for the **Fliplet Events** solution using Playwright with TypeScript.
 
-### Key Features
-- Global setup project generates role-based `storageState` for fast, isolated tests
-- Global teardown cleans auth artifacts for clean runs
-- Projects split by feature area and role for parallel CI execution
-- Role-first, user-centric selectors (`getByRole`, `getByLabel`, `getByTestId`)
-- Trace-on-retry, HTML reporting, and UI mode for local debugging
-- **API Testing Framework** with Fliplet Data Sources integration
-- **Clean Architecture** with separated utils/ and helpers/ layers
+### 📊 Test Coverage
+- **17 User Journeys** → 62 test scenarios → 183 test case validations
+- **Test Pyramid Strategy**: Journey + Module + Integration + Specialized tests
+- **10-Week Implementation Roadmap** with 5 phases
+- **Full Traceability**: Requirements → Test Cases → Scenarios → Journeys
+
+### 🎯 Key Features
+- **Journey Tests**: Grouped E2E flows following user paths (auth, attendee, admin, integration)
+- **Module Tests**: Isolated feature testing for granular validation
+- **Global Setup**: Role-based `storageState` for fast, isolated tests
+- **Page Object Model**: Clean separation of UI interactions and test logic
+- **Role-Based Selectors**: User-centric locators (`getByRole`, `getByLabel`, `getByTestId`)
+- **API Testing Framework**: Fliplet Data Sources integration
+- **Clean Architecture**: Separated utils/, helpers/, and fixtures/ layers
+- **CI/CD Ready**: Fully automated, parallelizable test execution
 
 ### Prerequisites
 - Node.js 18+
@@ -49,33 +56,47 @@ FLIPLET_API_TOKEN=your_api_token_here
 AGENDA_DS=your_agenda_data_source_id
 ```
 
-### NPM Scripts
+### 🚀 Quick Test Commands
+
 ```bash
 # Full suite
 npm test
 
-# Subsets
-npm run test:user
-npm run test:admin
-npm run test:features
-npm run test:journeys
-npm run test:e2e
-npm run test:regression
-npm run test:smoke
+# Journey Tests (E2E User Flows)
+npm run test:journeys              # All 17 journeys (62 scenarios)
+npx playwright test tests/journeys/auth-journeys/       # Auth journeys only
+npx playwright test tests/journeys/attendee-journeys/   # Attendee journeys
+npx playwright test tests/journeys/admin-journeys/      # Admin journeys
+npx playwright test tests/journeys/integration-journeys/# Integration tests
 
-# API Testing
-npm run test:api
+# Module Tests (Isolated Features)
+npm run test:user                  # All attendee/user module tests
+npm run test:admin                 # All admin module tests
+npx playwright test tests/user/agenda/    # Agenda module only
+npx playwright test tests/admin/attendance-management/  # Attendance module
 
-# Parallel/CI-friendly
-npm run test:parallel
-npm run test:ci
+# Specialized Tests
+npm run test:api                   # API integration tests
+npm run test:rbac                  # Role-based access control
+npm run test:accessibility         # A11y compliance tests
+npm run test:performance           # Performance benchmarks
 
-# Debugging & tooling
-npm run test:headed
-npm run test:debug
-npm run test:ui
-npm run test:report
-npm run test:trace
+# Test Subsets
+npm run test:features              # All feature tests
+npm run test:e2e                   # All E2E tests
+npm run test:regression            # Regression suite
+npm run test:smoke                 # Smoke tests (@P0)
+
+# Parallel/CI Execution
+npm run test:parallel              # Run tests in parallel
+npm run test:ci                    # CI-optimized run
+
+# Debugging & Tooling
+npm run test:headed                # Run with visible browser
+npm run test:debug                 # Debug mode with inspector
+npm run test:ui                    # Playwright UI mode
+npm run test:report                # Open HTML report
+npm run test:trace                 # View execution traces
 ```
 
 ### Playwright Configuration Highlights
@@ -102,39 +123,165 @@ Manually trigger global teardown (skip all tests but execute teardown):
 npx playwright test --grep-invert ".*"
 ```
 
-### Repository Structure
+### 📁 Repository Structure
+
 ```
-global-setup/            # auth.setup.ts creates storage state; global-teardown.ts cleans artifacts
-page-objects/            # Page Object Model (one file per screen/feature)
-helpers/                 # Business logic helpers
-  auth/                  # Login business logic (login.ts)
-  data/                  # Data source API helpers
-    agendaHelpers.ts     # Agenda API operations
-    constants.ts         # Data source configuration
-    flipletApiClient.ts  # Main API client facade
-tests/
-  auth/                  # Login, onboarding, registration, password reset
-  admin/                 # Admin features (content, attendance, agenda, etc.)
-  user/                  # Attendee features (agenda, meetings, networking, etc.)
-  journeys/              # Cross-page user journeys by role
-  rbac/                  # Role-based access control
-  accessibility/         # A11y checks and screen reader flows
-  api/                   # API testing (Fliplet Data Sources)
-    agenda-api-integration.spec.ts  # Insert/Delete with file persistence
-    crud-operations.spec.ts         # Clean API operations testing
-  performance/           # Basic performance checks
-utils/                   # Low-level utilities
-  api/                   # Generic API operations
-    dataSourceApi.ts     # Core CRUD functions (createEntry, deleteEntry)
-  page-manager.ts        # Page navigation utilities
-  page-url-resolver.ts   # URL resolution utilities
-fixtures/                # Test data templates
-  api/                   # API request body templates
-test-data/               # Environment-configured test data
-storage-state/           # Auth contexts (generated by setup)
-playwright-report/       # HTML reports (generated)
-test-results/            # Raw artifacts (generated)
+📦 fliplet-event-single/
+├── 📚 Artifacts/                           # Project documentation
+│   ├── Checklist.md                        # 183 test case definitions (source of truth)
+│   ├── User-Journeys-Table.md              # Main roadmap & traceability matrix
+│   ├── Journey-Tests-Pattern-Guide.md     # Journey test patterns & examples
+│   └── [Other analysis docs]
+│
+├── 🧪 tests/                               # All test files
+│   ├── README.md                           # Complete test suite overview
+│   │
+│   ├── 🚀 journeys/                        # E2E User Journey Tests (PRIMARY)
+│   │   ├── README.md                       # Journey-specific documentation
+│   │   ├── auth-journeys/                  # 2 files, 6 scenarios, 13 test cases
+│   │   ├── attendee-journeys/              # 5 files, 19 scenarios, 64 test cases
+│   │   ├── admin-journeys/                 # 6 files, 26 scenarios, 78 test cases
+│   │   └── integration-journeys/           # 3 files, 11 scenarios, 18 test cases
+│   │
+│   ├── 🧩 user/                            # Module Tests - Attendee Features
+│   │   ├── agenda/                         # Session browsing, RSVP, check-in, polls
+│   │   ├── home/                           # Navigation, digital card, menu
+│   │   ├── materials/                      # Materials browsing, RBAC
+│   │   ├── meetings/                       # Booking, availability, notifications
+│   │   └── networking/                     # Attendees, speakers, profiles
+│   │
+│   ├── 🔧 admin/                           # Module Tests - Admin Features
+│   │   ├── agenda-management/              # Session config, RSVP, capacity, QR
+│   │   ├── attendance-management/          # Manual check-in, QR scan, reports
+│   │   ├── content-management/             # Materials, exhibitors, communications
+│   │   ├── meeting-settings/               # Availability, booking, locations
+│   │   └── user-management/                # CRUD, bulk import
+│   │
+│   ├── 🔐 auth/                            # Authentication module tests
+│   ├── 🔒 rbac/                            # Role-based access control
+│   ├── 🌐 api/                             # API integration tests
+│   ├── ♿ accessibility/                    # A11y compliance
+│   └── ⚡ performance/                     # Performance benchmarks
+│
+├── 📄 page-objects/                        # Page Object Model
+│   ├── login.page.ts                       # Login screen interactions
+│   ├── agenda.page.ts                      # Agenda screen interactions
+│   ├── admin-manage-agenda.page.ts         # Admin agenda management
+│   └── [Other page objects]
+│
+├── 🛠️ helpers/                             # Business logic helpers
+│   ├── auth/                               # Authentication helpers
+│   │   └── login.ts                        # Login flows by role
+│   └── data/                               # API/data helpers
+│       ├── agendaHelpers.ts                # Agenda operations
+│       ├── flipletApiClient.ts             # Main API client facade
+│       └── constants.ts                    # Data source config
+│
+├── 🔧 utils/                               # Low-level utilities
+│   ├── api/                                # Generic API operations
+│   │   └── dataSourceApi.ts               # Core CRUD functions
+│   ├── page-manager.ts                     # Page navigation
+│   └── page-url-resolver.ts               # URL resolution
+│
+├── 📦 fixtures/                            # Test data templates
+│   └── api/                                # API request body templates
+│       └── apiRequestBodies.ts
+│
+├── 🗂️ test-data/                          # Environment-based test data
+│   └── app.data.ts                         # Credentials & config
+│
+├── 🔐 global-setup/                        # Test setup/teardown
+│   ├── auth.setup.ts                       # Generate role-based storage states
+│   └── global-teardown.ts                  # Clean auth artifacts
+│
+├── 💾 storage-state/                       # Auth contexts (generated)
+├── 📊 playwright-report/                   # HTML reports (generated)
+├── 📋 test-results/                        # Raw artifacts (generated)
+│
+├── ⚙️ playwright.config.ts                 # Playwright configuration
+├── 📝 .env.example                         # Environment template
+└── 📖 README.md                            # This file
 ```
+
+**See:** `tests/README.md` for detailed test structure documentation
+
+---
+
+### 🎯 Test Strategy & Implementation Roadmap
+
+#### Test Terminology
+| Term | Definition | Count | Example |
+|------|------------|-------|---------|
+| **Journey** | High-level user flow | 17 | `FLOW-AUTH-001: Onboarding` |
+| **Test Scenario** | Grouped E2E test (3-6 per journey) | 62 | "Happy Path: Login → RSVP → Check-in" |
+| **Test Case Validation** | Individual checklist item | 183 | `GEN-LOGIN-001`, `ATT-AGENDA-005` |
+
+#### 10-Week Implementation Roadmap
+
+| Phase | Timeline | Focus | Scenarios | Test Cases | Status |
+|-------|----------|-------|-----------|------------|--------|
+| **Phase 1** | Week 1-2 | Auth & Admin Setup | 14 | 36 | ✅ Structured |
+| **Phase 2** | Week 3-4 | Attendee Core (Check-in, RSVP) | 13 | 39 | ✅ Structured |
+| **Phase 3** | Week 5-6 | Meeting Booking System | 13 | 38 | ✅ Structured |
+| **Phase 4** | Week 7-8 | Admin Management | 13 | 35 | ✅ Structured |
+| **Phase 5** | Week 9-10 | Admin CRUD Operations | 9 | 25 | ✅ Structured |
+
+**Total:** 62 scenarios → 183 test case validations
+
+#### Test Pyramid
+```
+               Journey Tests (62 scenarios)
+               Critical user flows, E2E paths
+              /                              \
+            /         Integration Tests        \
+          /        (Cross-module interactions)   \
+        /___________________________________________\
+       /                                             \
+     /              Module Tests                      \
+    /       (Isolated feature validation)              \
+   /___________________________________________________ \
+  /                                                      \
+ /  Specialized Tests (API, RBAC, A11y, Performance)     \
+\________________________________________________________/
+```
+
+#### Priority Levels
+- **P0 (Critical)**: 36 test cases - Auth, Check-in, RSVP core flows
+- **P1 (High)**: 109 test cases - Meetings, Admin config, Attendance
+- **P2 (Medium)**: 38 test cases - CRUD operations, Materials
+
+#### Journey Test Pattern
+All journey tests follow the **"Grouped Related Journeys"** pattern:
+- 3-6 sequential scenarios per file
+- Progressive state building
+- Complete user flows (not isolated tests)
+- Multiple test case validations per scenario
+
+**Example:**
+```typescript
+test.describe('FLOW-AUTH-002: Login & Registration', () => {
+  
+  test('Happy Path: Login → Navigate to Home', async ({ page }) => {
+    // Sequential flow validating multiple test cases
+    // Validates: GEN-LOGIN-001, GEN-LOGIN-002, GEN-HOME-001
+  });
+
+  test('Alternative: New User → Register → Auto-Login', async ({ page }) => {
+    // Alternative flow building on previous context
+    // Validates: GEN-LOGIN-005, GEN-LOGIN-006
+  });
+
+});
+```
+
+**📚 Documentation:**
+- `Artifacts/User-Journeys-Table.md` - Complete roadmap & traceability
+- `Artifacts/Journey-Tests-Pattern-Guide.md` - Detailed pattern guide
+- `Artifacts/Checklist.md` - 183 test case definitions (source of truth)
+- `tests/README.md` - Test suite overview
+- `tests/journeys/README.md` - Journey-specific details
+
+---
 
 ### API Testing Framework
 
@@ -215,14 +362,60 @@ npx playwright show-trace trace.zip      # open saved trace
   - `npm ci && npm run test:ci`
   - Upload `playwright-report/` as an artifact
 
-### Conventions & Principles
-- Separation of Concerns: tests vs. page objects vs. data
-- DRY: extract reusable flows into helpers/page objects
-- Test Independence & Atomicity: no hidden state; do not depend on prior test
-- AAA: Arrange inputs, Act with one user action, Assert results
-- Explicit waits via Playwright’s auto-wait and web-first assertions; no fixed sleeps
-- Stable selectors first (`getByRole`, `getByTestId`), avoid fragile selectors
-- KISS: keep tests simple, readable, and maintainable
+### ✅ Quality Standards & Best Practices
+
+#### Core Principles
+- **Separation of Concerns (SoC)**: Tests, Page Objects, Helpers, and Test Data in distinct layers
+- **DRY (Don't Repeat Yourself)**: Reusable flows in helpers/page objects, no duplication
+- **Test Independence**: Each test runs independently, no shared state between tests
+- **AAA Pattern** (Arrange, Act, Assert): Clear three-section structure in every test
+- **KISS (Keep It Simple)**: Readable, maintainable code over clever optimizations
+
+#### Playwright Best Practices
+- ✅ **Role-Based Selectors**: Use `getByRole`, `getByLabel`, `getByText`, `getByTestId`
+- ✅ **Web-First Assertions**: Use `toBeVisible`, `toHaveText`, `toContain`, etc.
+- ✅ **Automatic Waiting**: Rely on Playwright's auto-wait, no `waitForTimeout`
+- ✅ **Explicit Waits**: Use `waitFor` with conditions when needed
+- ❌ **Avoid**: CSS selectors, XPath, hardcoded timeouts, `page.locator` (use role-based)
+
+#### Test Structure
+- **Journey Tests**: Group 3-6 related scenarios, progressive state, complete flows
+- **Module Tests**: Isolated features, `beforeEach` setup, single validation per test
+- **Integration Tests**: Cross-module interactions, validate system behavior
+- **Clear Naming**: Descriptive test names explaining expected behavior
+
+#### Documentation Standards
+- ✅ JSDoc comments for all helper functions
+- ✅ Header comments in test files with journey metadata
+- ✅ TODO blocks with step-by-step instructions
+- ✅ Traceability: Link test scenarios to test case IDs
+
+---
+
+### 📊 Current Project Status
+
+| Aspect | Status | Details |
+|--------|--------|---------|
+| **Test Structure** | ✅ Complete | All 62 scenarios structured with TODO blocks |
+| **Documentation** | ✅ Complete | Comprehensive guides and traceability |
+| **Page Objects** | 🔄 In Progress | Core page objects created, some need updates |
+| **Journey Tests** | 📝 Ready for Implementation | Phase 1 (14 scenarios) ready to start |
+| **Module Tests** | 🔄 Mixed | Many implemented, 46 new stubs created |
+| **API Tests** | ✅ Implemented | Fliplet Data Source integration complete |
+| **RBAC Tests** | ✅ Implemented | Permission checks in place |
+| **Accessibility** | ✅ Implemented | A11y compliance tests ready |
+
+**Next Steps:**
+1. ⬜ Implement Phase 1 journey tests (Week 1-2: Auth & Admin Setup)
+2. ⬜ Create/update required Page Objects for Phase 1
+3. ⬜ Set up test data helpers for Phase 1 flows
+4. ⬜ Run and validate Phase 1 test suite
+5. ⬜ Proceed to Phase 2 (Attendee Core flows)
+
+**Last Updated:** 2025-10-06  
+**Ready for:** Phase 1 Implementation (14 scenarios → 36 test case validations)
+
+---
 
 ### Troubleshooting
 - "No tests found" when running setup or teardown-only commands is expected if you purposely filter tests
