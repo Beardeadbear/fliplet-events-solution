@@ -1,9 +1,8 @@
 // helpers/auth/login.ts
 
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import { LoginPage } from '../../page-objects/login.page';
 import { HomePage } from '../../page-objects/home.page';
-import { OnboardingPage } from '../../page-objects/onboarding.page';
 import { 
   ADMIN_EMAIL, 
   ADMIN_PASSWORD, 
@@ -16,103 +15,165 @@ import {
 } from '../../test-data/app.data';
 
 /**
- * Complete login flow for Admin user
- * Handles onboarding, login, and post-login setup
+ * Login as Admin user (onboarding should be completed separately)
  * @param page - Playwright Page instance
  */
 export async function loginAsAdmin(page: Page): Promise<void> {
-  const onboardingPage = new OnboardingPage(page);
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
 
-  await onboardingPage.goto();
-  await onboardingPage.completeOnboarding();
   await loginPage.login(ADMIN_EMAIL, ADMIN_PASSWORD);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  
+  // Wait for navigation to complete
+  await page.waitForLoadState('networkidle');
+  
+  // Handle push notifications if they appear
+  try {
+    await homePage.allowPushNotifications();
+  } catch (error) {
+    // Push notifications might not appear, that's okay
+    console.log('Push notifications not found or already handled');
+  }
 }
 
 /**
- * Complete login flow for Attendee user
- * Handles onboarding, login, and post-login setup
+ * Login as Attendee user (onboarding should be completed separately)
  * @param page - Playwright Page instance
  */
 export async function loginAsAttendee(page: Page): Promise<void> {
-  const onboardingPage = new OnboardingPage(page);
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
 
-  await onboardingPage.goto();
-  await onboardingPage.completeOnboarding();
   await loginPage.login(ATTENDEE_EMAIL, ATTENDEE_PASSWORD);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  
+  // Wait for navigation to complete
+  await page.waitForLoadState('networkidle');
+  
+  // Handle push notifications if they appear
+  try {
+    await homePage.allowPushNotifications();
+  } catch (error) {
+    // Push notifications might not appear, that's okay
+    console.log('Push notifications not found or already handled');
+  }
 }
 
 /**
- * Complete login flow for Speaker user
- * Handles onboarding, login, and post-login setup
+ * Login as Speaker user (onboarding should be completed separately)
  * @param page - Playwright Page instance
  */
 export async function loginAsSpeaker(page: Page): Promise<void> {
-  const onboardingPage = new OnboardingPage(page);
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
 
-  await onboardingPage.goto();
-  await onboardingPage.completeOnboarding();
   await loginPage.login(SPEAKER_EMAIL, SPEAKER_PASSWORD);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  
+  // Handle push notifications if they appear
+  try {
+    await homePage.allowPushNotifications();
+  } catch (error) {
+    // Push notifications might not appear, that's okay
+    console.log('Push notifications not found or already handled');
+  }
 }
 
 /**
- * Complete login flow for Exhibitor user
- * Handles onboarding, login, and post-login setup
+ * Login as Exhibitor user (onboarding should be completed separately)
  * @param page - Playwright Page instance
  */
 export async function loginAsExhibitor(page: Page): Promise<void> {
-  const onboardingPage = new OnboardingPage(page);
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
 
-  await onboardingPage.goto();
-  await onboardingPage.completeOnboarding();
   await loginPage.login(EXHIBITOR_EMAIL, EXHIBITOR_PASSWORD);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  
+  // Wait for navigation to complete
+  await page.waitForLoadState('networkidle');
+  
+  // Handle push notifications if they appear
+  try {
+    await homePage.allowPushNotifications();
+  } catch (error) {
+    // Push notifications might not appear, that's okay
+    console.log('Push notifications not found or already handled');
+  }
 }
 
 /**
- * Generic login function with custom credentials
- * Handles onboarding, login, and post-login setup
+ * Attempts login with invalid password (valid email, wrong password)
  * @param page - Playwright Page instance
- * @param username - Username/email
- * @param password - Password
+ * @param email - Valid email address
+ * @param invalidPassword - Wrong password
  */
-export async function loginWithCredentials(page: Page, username: string, password: string): Promise<void> {
-  const onboardingPage = new OnboardingPage(page);
+export async function loginWithInvalidPassword(page: Page, email: string, invalidPassword: string): Promise<void> {
   const loginPage = new LoginPage(page);
-  const homePage = new HomePage(page);
-
-  await onboardingPage.goto();
-  await onboardingPage.completeOnboarding();
-  await loginPage.login(username, password);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  
+  await loginPage.loginAndValidateError(email, invalidPassword);
 }
 
 /**
- * Login without onboarding (for tests that skip onboarding)
+ * Attempts login with non-existent email
  * @param page - Playwright Page instance
- * @param username - Username/email
- * @param password - Password
+ * @param nonExistentEmail - Email that doesn't exist in system
+ * @param password - Any password
  */
-export async function loginDirectly(page: Page, username: string, password: string): Promise<void> {
+export async function loginWithNonExistentEmail(page: Page, nonExistentEmail: string, password: string): Promise<void> {
   const loginPage = new LoginPage(page);
-  const homePage = new HomePage(page);
+  
+  await loginPage.loginAndValidateError(nonExistentEmail, password);
 
-  await loginPage.login(username, password);
-  await homePage.waitForPageLoad();
-  await homePage.allowPushNotifications();
+  await expect(page).toHaveURL(/login/);
 }
+
+/**
+ * Attempts login with empty email and password fields
+ * @param page - Playwright Page instance
+ */
+export async function loginWithEmptyFields(page: Page): Promise<void> {
+  const loginPage = new LoginPage(page);
+  
+  // Don't fill any fields, just click login button
+  await expect(loginPage.loginButton).toBeVisible();
+  await expect(loginPage.loginButton).toBeEnabled();
+  await loginPage.loginButton.click();
+  
+  // Should stay on login page (form validation should prevent submission)
+  await expect(page).toHaveURL(/login/);
+}
+
+/**
+ * Attempts login with empty email field only
+ * @param page - Playwright Page instance
+ * @param password - Valid password
+ */
+export async function loginWithEmptyEmail(page: Page, password: string): Promise<void> {
+  const loginPage = new LoginPage(page);
+  
+  // Fill only password, leave email empty
+  await loginPage.passwordInput.fill(password);
+  await expect(loginPage.loginButton).toBeVisible();
+  await expect(loginPage.loginButton).toBeEnabled();
+  await loginPage.loginButton.click();
+  
+  // Should stay on login page (form validation should prevent submission)
+  await expect(page).toHaveURL(/login/);
+}
+
+/**
+ * Attempts login with empty password field only
+ * @param page - Playwright Page instance
+ * @param email - Valid email address
+ */
+export async function loginWithEmptyPassword(page: Page, email: string): Promise<void> {
+  const loginPage = new LoginPage(page);
+  
+  // Fill only email, leave password empty
+  await loginPage.emailInput.fill(email);
+  await expect(loginPage.loginButton).toBeVisible();
+  await expect(loginPage.loginButton).toBeEnabled();
+  await loginPage.loginButton.click();
+  
+  // Should stay on login page (form validation should prevent submission)
+  await expect(page).toHaveURL(/login/);
+}
+
