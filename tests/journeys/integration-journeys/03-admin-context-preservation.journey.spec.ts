@@ -1,79 +1,110 @@
 /**
  * FLOW-INTEGRATION-003: Admin Context Preservation
- * Priority: P0
- * Dependencies: FLOW-ADMIN-002
- * Est. Tests: 5
+ * Priority: P1
+ * Dependencies: FLOW-AUTH-002, FLOW-ADMIN-002
+ * Est. Tests: 3 integration scenarios
  * 
- * Validates: Navigation preserves selected event/session context
- * 
- * Test Cases: INT-014 to INT-016, ADM-SCANQR-005, ADM-SCANQR-006
+ * Test Cases: ADM-CHECK_IN-014, ADM-SCANQR-006, Integration validation
  */
 
 import { test, expect } from '@playwright/test';
 
 test.describe('FLOW-INTEGRATION-003: Admin Context Preservation', () => {
   
-  test.beforeEach(async ({ page }) => {
-    // TODO: Setup - Login as Admin
+  test('Session Context Preserved: Attendance → QR Scan → Return (session selection maintained)', async ({ page }) => {
+    // TODO: Implement session context preservation validation
+    // 
+    // Step 1: Login as Admin
+    // Step 2: Navigate to Admin - Attendance screen
+    // Step 3: Select "Session X" from dropdown (validates: ADM-CHECK_IN-002)
+    // Step 4: Verify attendee list loads for "Session X"
+    // Step 5: Search for specific attendee "John Doe"
+    // Step 6: Click "Scan QR" button for John Doe (validates: ADM-CHECK_IN-009)
+    // Step 7: Verify redirect to Admin - Scan QR screen
+    // Step 8: Verify "Session X" context passed as parameter (validates: ADM-CHECK_IN-014)
+    // Step 9: Scan John Doe's QR code
+    // Step 10: Verify success message: "Checked in to Session X"
+    // Step 11: Click "Manual check in" button (validates: ADM-SCANQR-006)
+    // Step 12: Verify redirect back to Attendance screen
+    // Step 13: Verify "Session X" is STILL selected in dropdown (context preserved)
+    // Step 14: Verify John Doe now appears in "Checked-in" tab
+    // Step 15: Verify admin doesn't need to re-select session
   });
 
-  test('INT-014 - Admin selects "Session X" → Scans QR → Returns → "Session X" still selected', async ({ page }) => {
-    // TODO: Implement test
-    // 1. Admin: Open Attendance screen
-    // 2. Admin: Select "Session: Keynote Speech" from dropdown
-    // 3. Admin: Tap "Scan User QR Code" button
-    // 4. Verify: Redirected to Scan QR screen
-    // 5. Verify: Session ID passed as query parameter
-    // 6. Admin: Scan User A's QR code
-    // 7. Verify: Success message displayed
-    // 8. Admin: Tap "Manual check in" button
-    // 9. Verify: Redirected back to Attendance screen
-    // 10. Verify: "Session: Keynote Speech" STILL selected
+  test('Event Context Preserved: Event-level attendance → QR scan → Return', async ({ page }) => {
+    // TODO: Implement event context preservation validation
+    // 
+    // Step 1: Login as Admin
+    // Step 2: Navigate to Admin - Attendance screen
+    // Step 3: Select "Event" (not session) from dropdown
+    // Step 4: Verify attendee list loads for entire event
+    // Step 5: Verify "Add Walk in" button visible
+    // Step 6: Search for attendee "Jane Smith"
+    // Step 7: Click "Scan QR" for Jane Smith
+    // Step 8: Verify redirect to Scan QR screen with "Event" context
+    // Step 9: Scan Jane Smith's QR code (validates: ADM-SCANQR-002)
+    // Step 10: Verify success: "Checked in to Event"
+    // Step 11: Click "Manual check in" button
+    // Step 12: Verify redirect back to Attendance
+    // Step 13: Verify "Event" is STILL selected (not switched to session)
+    // Step 14: Verify Jane Smith appears in event-level checked-in list
   });
 
-  test('INT-015 - Admin filters "Not Checked-in" → Scans QR → Returns → Filter persists', async ({ page }) => {
-    // TODO: Implement test
-    // 1. Admin: Open Attendance screen
-    // 2. Admin: Select "Session: Workshop A"
-    // 3. Admin: Select "Not Checked-in" tab
-    // 4. Admin: Tap "Scan User QR Code"
-    // 5. Admin: Scan User B's QR code
-    // 6. Admin: Return to Attendance
-    // 7. Verify: "Not Checked-in" tab STILL selected
-    // 8. Verify: "Session: Workshop A" STILL selected
+  test('Filter & Search Preserved: Apply filters → Navigate away → Return (filters maintained)', async ({ page }) => {
+    // TODO: Implement filter state preservation validation
+    // 
+    // SET FILTERS:
+    // Step 1: Login as Admin
+    // Step 2: Navigate to Admin - Attendance
+    // Step 3: Select "Session Y"
+    // Step 4: Click "Checked-in" status tab (validates: ADM-CHECK_IN-006)
+    // Step 5: Enter search term "Smith" in search box (validates: ADM-CHECK_IN-007)
+    // Step 6: Verify filtered results showing only checked-in users with "Smith"
+    // 
+    // NAVIGATE AWAY:
+    // Step 7: Click "Scan QR" for one of the filtered users
+    // Step 8: Complete QR scan operation
+    // Step 9: Return to Attendance screen
+    // 
+    // VERIFY FILTERS MAINTAINED:
+    // Step 10: Verify "Session Y" still selected
+    // Step 11: Verify "Checked-in" tab still active
+    // Step 12: Verify search term "Smith" still in search box
+    // Step 13: Verify filtered results maintained
+    // Step 14: Click "Refresh" button (validates: ADM-CHECK_IN-011)
+    // Step 15: Verify filters persist even after refresh
   });
 
-  test('INT-016 - Checked-in user appears in correct tab after scan', async ({ page }) => {
-    // TODO: Implement test
-    // 1. Admin: Open Attendance screen
-    // 2. Admin: Select "Session: Keynote Speech"
-    // 3. Admin: Select "Not Checked-in" tab
-    // 4. Verify: User A appears in list
-    // 5. Admin: Scan User A's QR code via "Scan User QR Code" button
-    // 6. Admin: Return to Attendance
-    // 7. Admin: Switch to "Checked-in" tab
-    // 8. Verify: User A now appears in "Checked-in" tab
-    // 9. Admin: Switch back to "Not Checked-in" tab
-    // 10. Verify: User A no longer in "Not Checked-in" tab
-  });
-
-  test('ADM-SCANQR-005 - Admin sees "Scan again" and "Manual check in" buttons after scan result', async ({ page }) => {
-    // TODO: Implement test
-    // 1. Admin: Navigate to Scan QR screen from Attendance
-    // 2. Admin: Scan User A's QR code
-    // 3. Verify: Success/error message displayed
-    // 4. Verify: "Scan again" button visible
-    // 5. Verify: "Manual check in" button visible
-  });
-
-  test('ADM-SCANQR-006 - Tapping "Manual check in" redirects Admin back to Attendance with context preserved', async ({ page }) => {
-    // TODO: Implement test
-    // 1. Admin: Scan QR from Attendance (Session: Workshop A, Not Checked-in tab)
-    // 2. Admin: Tap "Manual check in" button
-    // 3. Verify: Redirected to Attendance screen
-    // 4. Verify: "Session: Workshop A" selected
-    // 5. Verify: "Not Checked-in" tab active (context fully preserved)
+  test('Multi-Session Workflow: Switch sessions → Scan QR → Return to correct session', async ({ page }) => {
+    // TODO: Implement multi-session context switching validation
+    // 
+    // SESSION A WORKFLOW:
+    // Step 1: Login as Admin
+    // Step 2: Navigate to Attendance
+    // Step 3: Select "Session A"
+    // Step 4: Note attendee count for Session A
+    // Step 5: Click "Scan QR" for attendee
+    // Step 6: Verify "Session A" context in QR scan screen
+    // Step 7: Scan attendee QR
+    // Step 8: Return to Attendance
+    // Step 9: Verify "Session A" still selected
+    // Step 10: Verify updated check-in count
+    // 
+    // SWITCH TO SESSION B:
+    // Step 11: Change dropdown from "Session A" to "Session B"
+    // Step 12: Verify attendee list updates for Session B
+    // Step 13: Click "Scan QR" for different attendee
+    // Step 14: Verify "Session B" context in QR scan screen (NOT Session A)
+    // Step 15: Scan attendee QR for Session B
+    // Step 16: Return to Attendance
+    // Step 17: Verify "Session B" still selected (did not revert to Session A)
+    // 
+    // VERIFY DATA INTEGRITY:
+    // Step 18: Switch back to "Session A"
+    // Step 19: Verify check-in from Step 7 is still recorded
+    // Step 20: Switch to "Session B"
+    // Step 21: Verify check-in from Step 15 is recorded in correct session
+    // Step 22: Verify no data leaked between sessions
   });
 
 });
-
