@@ -68,7 +68,7 @@ test.describe('FLOW-INTEGRATION-001: RSVP → Check-In Independence', () => {
     // Step 17: Verify check-in count = 3 (includes non-RSVP'd user)
   });
 
-  test('Admin Verification: Check-in list shows both RSVP'd and non-RSVP'd attendees', async ({ page, context }) => {
+  test('Admin Verification: Check-in list shows both RSVP and non-RSVP attendees', async ({ page, context }) => {
     // TODO: Implement admin view validation
     // 
     // PREREQUISITE:

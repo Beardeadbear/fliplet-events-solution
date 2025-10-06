@@ -1,8 +1,8 @@
 # Event - Single Upgrade: User Journeys Table
 
-**Solution:** Event - Single Upgrade  
+**Solution:** Events 
 **Date:** 2025-10-06  
-**Total:** 17 journeys | 183 tests | 10 weeks
+**Total:** 17 journeys | 62 test scenarios | 183 test case validations | 10 weeks
 
 ---
 
@@ -32,39 +32,40 @@
 ## 📊 Summary Statistics
 
 ### By Priority
-| Priority | Journey Count | Test Count | % of Total Tests |
-|----------|--------------|------------|------------------|
-| **P0** | 14 | 146 | 80% |
-| **P1** | 2 | 27 | 15% |
-| **P2** | 1 | 10 | 5% |
-| **Total** | **17** | **183** | **100%** |
+| Priority | Journey Count | Test Scenarios | Test Case Validations | % of Total |
+|----------|--------------|----------------|----------------------|------------|
+| **P0** | 14 | 49 | 146 | 80% |
+| **P1** | 2 | 9 | 27 | 15% |
+| **P2** | 1 | 4 | 10 | 5% |
+| **Total** | **17** | **62** | **183** | **100%** |
 
 ### By User Role
-| Role | Journey Count | Test Count |
-|------|--------------|------------|
-| **Attendee** | 6 | 72 |
-| **Admin** | 8 | 91 |
-| **Integration** | 3 | 20 |
-| **Total** | **17** | **183** |
+| Role | Journey Count | Test Scenarios | Test Case Validations |
+|------|--------------|----------------|----------------------|
+| **Attendee** | 6 | 19 | 72 |
+| **Admin** | 8 | 26 | 91 |
+| **Integration** | 3 | 11 | 20 |
+| **Auth** | 2 | 6 | 13 |
+| **Total** | **17** | **62** | **183** |
 
 ### By Module
-| Module | Journey Count | Test Count |
-|--------|--------------|------------|
-| Authentication | 2 | 13 |
-| Event Check-In | 1 | 9 |
-| Session RSVP | 1 | 13 |
-| Session Check-In | 1 | 12 |
-| Meeting Booking | 2 | 30 |
-| Admin Configuration | 3 | 39 |
-| Admin CRUD | 3 | 37 |
-| Integration Tests | 3 | 20 |
-| **Total** | **17** | **183** |
+| Module | Journey Count | Test Scenarios | Test Case Validations |
+|--------|--------------|----------------|----------------------|
+| Authentication | 2 | 6 | 13 |
+| Event Check-In | 1 | 3 | 9 |
+| Session RSVP | 1 | 4 | 13 |
+| Session Check-In | 1 | 3 | 12 |
+| Meeting Booking | 2 | 12 | 30 |
+| Admin Configuration | 3 | 13 | 39 |
+| Admin CRUD | 3 | 13 | 37 |
+| Integration Tests | 3 | 11 | 20 |
+| **Total** | **17** | **62** | **183** |
 
 ---
 
 ## 🗓️ Implementation Roadmap Table
 
-| Phase | Week | Journey ID | Journey Name | Tests | Dependencies | Status |
+| Phase | Week | Journey ID | Journey Name | Test Cases | Dependencies | Status |
 |-------|------|------------|--------------|-------|--------------|--------|
 | **Phase 1: Auth & Admin Setup** | Week 1-2 | FLOW-AUTH-001 | Onboarding (First Launch) | 2 | None | ⬜ Pending |
 | | | FLOW-AUTH-002 | Login & Registration | 11 | FLOW-AUTH-001 | ⬜ Pending |
@@ -110,8 +111,8 @@
 
 ## ✅ Critical Path Journeys (Must Complete First)
 
-| Order | Journey ID | Journey Name | Tests | Cumulative Tests |
-|-------|------------|--------------|-------|------------------|
+| Order | Journey ID | Journey Name | Test Cases | Cumulative |
+|-------|------------|--------------|------------|------------|
 | 1 | FLOW-AUTH-001 | Onboarding (First Launch) | 2 | 2 |
 | 2 | FLOW-AUTH-002 | Login & Registration | 11 | 13 |
 | 3 | FLOW-ADMIN-001 | Configure RSVP & Check-In | 16 | 29 |
@@ -122,7 +123,7 @@
 | 8 | FLOW-EVT-004 | Book Meeting Lifecycle | 21 | 91 |
 | 9 | FLOW-ADMIN-002 | Attendance Management | 18 | 109 |
 
-**Critical Path Total:** 9 journeys | 109 tests | Blocks 11 other journeys
+**Critical Path Total:** 9 journeys | 109 test case validations | Blocks 11 other journeys
 
 ---
 
