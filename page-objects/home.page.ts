@@ -1,7 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { BASE_URL } from '../test-data/app.data';
-import { NavigationMenu } from './navigation-menu.page';
+import { NavigationMenu } from './general/navigation-menu.page';
 
 /**
  * Home page object containing all locators and actions for the Home screen

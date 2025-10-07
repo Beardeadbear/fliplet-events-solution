@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { AgendaPage } from '../../../page-objects/agenda.page';
+import { AgendaPage } from '../../../page-objects/general/agenda.page';
 
 test.describe('Agenda Browsing', () => {
   test('User sees a list of upcoming sessions with time and location', async ({ page }) => {

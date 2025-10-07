@@ -150,8 +150,6 @@ export default defineConfig({
       },
       testMatch: 'tests/performance/**/*.spec.ts',
     },
-<<<<<<< Updated upstream
-=======
 
     // ========== STAGEHAND TESTS ==========
     {
@@ -164,6 +162,5 @@ export default defineConfig({
       },
       testMatch: 'tests/stagehand/**/*.spec.ts',
     },
->>>>>>> Stashed changes
   ],
 }); 

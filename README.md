@@ -356,6 +356,39 @@ test('Admin can manage content', async ({ page }) => {
 
 The framework integrates [Stagehand](https://github.com/browserbase/stagehand) for AI-powered browser automation, enabling visual element recognition and natural language test commands.
 
+#### What is Stagehand?
+
+Stagehand is an AI-powered browser automation tool that uses computer vision and natural language processing to interact with web applications. Unlike traditional automation that relies on CSS selectors or XPath, Stagehand understands web pages visually and responds to human-like instructions.
+
+#### How Stagehand Works
+
+1. **Visual Understanding**: Stagehand takes screenshots of the web page and uses AI to understand the visual layout
+2. **Natural Language Processing**: It interprets human-readable commands like "Click the login button" or "Fill the email field"
+3. **Element Recognition**: Uses computer vision to locate elements based on their appearance, text, and context
+4. **Action Execution**: Performs the requested action using Playwright's underlying automation engine
+
+#### Key Benefits
+
+**🎯 Reduced Maintenance Overhead**
+- **No Brittle Selectors**: Eliminates dependency on CSS classes, IDs, or XPath that break with UI changes
+- **Self-Healing Tests**: Adapts to minor UI changes without requiring code updates
+- **Visual Stability**: Tests remain stable even when developers change element attributes
+
+**⚡ Faster Test Development**
+- **Natural Language Commands**: Write tests using plain English instead of complex selectors
+- **Rapid Prototyping**: Create test scenarios quickly without deep DOM knowledge
+- **Reduced Learning Curve**: Non-technical team members can understand and modify tests
+
+**🔍 Enhanced Test Reliability**
+- **Context-Aware Actions**: AI understands page context to make smarter decisions
+- **Error Recovery**: Better handling of dynamic content and loading states
+- **Cross-Browser Consistency**: Visual recognition works consistently across different browsers
+
+**🚀 Advanced Capabilities**
+- **Dynamic Element Discovery**: Finds elements even when they change position or appearance
+- **Intelligent Waiting**: Automatically waits for elements to be ready before interacting
+- **Smart Data Extraction**: Extracts information from complex layouts without manual parsing
+
 #### Architecture
 - **`page-objects/base.page.ts`**: Base page with Stagehand integration for all page objects
 - **`fixtures/stagehand.fixture.ts`**: Playwright fixture providing direct Stagehand access
@@ -363,6 +396,20 @@ The framework integrates [Stagehand](https://github.com/browserbase/stagehand) f
 - **Environment Configuration**: LOCAL and BROWSERBASE environments supported
 
 #### Usage Examples
+
+**Traditional Playwright vs Stagehand Comparison:**
+
+```typescript
+// Traditional Playwright (brittle selectors)
+await page.locator('#login-form input[type="email"]').fill('admin@example.com');
+await page.locator('#login-form input[type="password"]').fill('password123');
+await page.locator('#login-form button[data-testid="submit"]').click();
+
+// Stagehand (natural language)
+await stagehand.page.act("Fill email field with admin@example.com");
+await stagehand.page.act("Fill password field with password123");
+await stagehand.page.act("Click the login button");
+```
 
 **Page Object Integration:**
 ```typescript
@@ -394,9 +441,39 @@ test('AI-powered navigation', async ({ page, stagehand }) => {
 ```
 
 **AI Methods:**
-- **`act()`**: Perform actions using natural language
-- **`observe()`**: Identify interactive elements on the page
-- **`extract()`**: Extract data from page elements
+- **`act(instruction)`**: Perform actions using natural language
+  ```typescript
+  await stagehand.page.act("Click the submit button");
+  await stagehand.page.act("Scroll down to see more content");
+  await stagehand.page.act("Select 'Premium Plan' from the dropdown");
+  ```
+
+- **`observe(instruction)`**: Identify interactive elements on the page
+  ```typescript
+  const elements = await stagehand.page.observe("What buttons can I click on this page?");
+  const forms = await stagehand.page.observe("Find all form fields");
+  ```
+
+- **`extract(instruction)`**: Extract data from page elements
+  ```typescript
+  const userInfo = await stagehand.page.extract("Extract the user's name and email from the profile");
+  const prices = await stagehand.page.extract("Get all product prices from the catalog");
+  ```
+
+#### When to Use Stagehand
+
+**✅ Ideal Use Cases:**
+- **Complex UI Interactions**: Multi-step forms, dynamic content, complex layouts
+- **Rapid Test Creation**: Quick prototyping and exploratory testing
+- **Maintenance-Heavy Tests**: Tests that frequently break due to UI changes
+- **Cross-Platform Testing**: Ensuring consistent behavior across different browsers/devices
+- **Non-Technical Team Members**: Enabling QA team members to write tests without deep technical knowledge
+
+**⚠️ Consider Traditional Playwright For:**
+- **Performance-Critical Tests**: When speed is more important than flexibility
+- **Simple Interactions**: Basic clicks and form fills on stable UIs
+- **CI/CD Pipelines**: Where deterministic behavior is crucial
+- **Large-Scale Test Suites**: Where AI processing overhead becomes significant
 
 #### Configuration
 Stagehand supports both LOCAL and BROWSERBASE environments. Configure via `.env`:
@@ -417,7 +494,27 @@ npm run test:stagehand
 
 # Run specific Stagehand project
 npx playwright test --project="Stagehand Tests"
+
+# Run with verbose logging for debugging
+npx playwright test --project="Stagehand Tests" --reporter=list
 ```
+
+#### Best Practices
+
+**🎯 Effective Instructions:**
+- **Be Specific**: "Click the blue 'Submit' button" vs "Click button"
+- **Use Context**: "Fill the email field in the login form" vs "Fill email"
+- **Include Visual Cues**: "Click the red 'Delete' button with trash icon"
+
+**🔄 Hybrid Approach:**
+- **Use Playwright for**: Reliable, fast operations (navigation, simple clicks)
+- **Use Stagehand for**: Complex interactions, dynamic content, visual validation
+- **Combine Both**: Leverage the strengths of each approach
+
+**⚡ Performance Optimization:**
+- **Cache Results**: Store `observe()` results to avoid repeated AI calls
+- **Batch Operations**: Group related actions in single `act()` calls when possible
+- **Environment Selection**: Use LOCAL for development, BROWSERBASE for CI/CD
 
 ### Page Objects & Selectors
 - Prefer resilient, user-facing locators: `page.getByRole`, `page.getByLabel`, `page.getByText`, `page.getByTestId`

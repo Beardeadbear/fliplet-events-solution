@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import { BasePage } from './base.page';
+import { BasePage } from '../base.page';
 
 export class NavigationMenu extends BasePage {
   // Bottom navigation container

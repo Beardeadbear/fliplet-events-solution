@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { AgendaPage } from '../../../page-objects/agenda.page';
+import { AgendaPage } from '../../../page-objects/general/agenda.page';
 
 test.describe('Capacity Management', () => {
   test('User sees capacity badge such as "2 spots left" or "Full"', async ({ page }) => {

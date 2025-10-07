@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { MyMeetingsPage } from '../../../page-objects/my-meetings.page';
+import { MyMeetingsPage } from '../../../page-objects/general/my-meetings.page';
 
 test.describe('Meeting Management', () => {
   test('User can approve meeting request', async ({ page }) => {

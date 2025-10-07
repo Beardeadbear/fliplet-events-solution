@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { BookMeetingPage } from '../../../page-objects/book-a-meeting.page';
+import { BookMeetingPage } from '../../../page-objects/general/book-a-meeting.page';
 
 test.describe('Meeting Booking', () => {
   test('User can book meeting with attendee', async ({ page }) => {

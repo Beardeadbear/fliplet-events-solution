@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import { BasePage } from './base.page';
+import { BasePage } from '../base.page';
 
 /**
  * Profile page object containing all locators and actions for the user profile screen

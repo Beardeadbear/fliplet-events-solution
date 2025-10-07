@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { AgendaPage } from '../../../page-objects/agenda.page';
+import { AgendaPage } from '../../../page-objects/general/agenda.page';
 
 test.describe('Session Check-in', () => {
   test('User sees a Check-In button if QR check-in is enabled', async ({ page }) => {

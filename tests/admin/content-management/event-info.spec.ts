@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../../page-objects/home.page';
-import { NavigationMenu } from '../../../page-objects/navigation-menu.page';
+import { NavigationMenu } from '../../../page-objects/general/navigation-menu.page';
 
 test.describe('Event Info Management', () => {
   let homePage: HomePage;
