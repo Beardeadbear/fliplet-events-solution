@@ -14,6 +14,7 @@ Comprehensive test automation framework for the **Fliplet Events** solution usin
 - **Global Setup**: Role-based `storageState` for fast, isolated tests
 - **Page Object Model**: Clean separation of UI interactions and test logic
 - **Role-Based Selectors**: User-centric locators (`getByRole`, `getByLabel`, `getByTestId`)
+- **AI-Powered Automation**: Stagehand integration for visual element recognition and natural language commands
 - **API Testing Framework**: Fliplet Data Sources integration
 - **Clean Architecture**: Separated utils/, helpers/, and fixtures/ layers
 - **CI/CD Ready**: Fully automated, parallelizable test execution
@@ -54,6 +55,13 @@ INVALID_PASSWORD=
 API_BASE_URL=https://api.fliplet.com/v1
 FLIPLET_API_TOKEN=your_api_token_here
 AGENDA_DS=your_agenda_data_source_id
+
+# Stagehand AI Automation (Optional)
+STAGEHAND_ENV=LOCAL
+STAGEHAND_MODEL=gpt-4o
+OPENAI_API_KEY=your_openai_api_key_here
+BROWSERBASE_API_KEY=your_browserbase_api_key_here
+BROWSERBASE_PROJECT_ID=your_browserbase_project_id_here
 ```
 
 ### 🚀 Quick Test Commands
@@ -80,6 +88,7 @@ npm run test:api                   # API integration tests
 npm run test:rbac                  # Role-based access control
 npm run test:accessibility         # A11y compliance tests
 npm run test:performance           # Performance benchmarks
+npm run test:stagehand             # AI-powered automation tests
 
 # Test Subsets
 npm run test:features              # All feature tests
@@ -157,6 +166,9 @@ npx playwright test --grep-invert ".*"
 │   │   ├── meeting-settings/               # Availability, booking, locations
 │   │   └── user-management/                # CRUD, bulk import
 │   │
+│   ├── 🤖 stagehand/                       # AI-powered automation tests
+│   │   └── stagehand-integration.spec.ts  # Stagehand integration examples
+│   │
 │   ├── 🔐 auth/                            # Authentication module tests
 │   ├── 🔒 rbac/                            # Role-based access control
 │   ├── 🌐 api/                             # API integration tests
@@ -164,6 +176,7 @@ npx playwright test --grep-invert ".*"
 │   └── ⚡ performance/                     # Performance benchmarks
 │
 ├── 📄 page-objects/                        # Page Object Model
+│   ├── base.page.ts                        # Base page with Stagehand integration
 │   ├── login.page.ts                       # Login screen interactions
 │   ├── agenda.page.ts                      # Agenda screen interactions
 │   ├── admin-manage-agenda.page.ts         # Admin agenda management
@@ -184,8 +197,9 @@ npx playwright test --grep-invert ".*"
 │   └── page-url-resolver.ts               # URL resolution
 │
 ├── 📦 fixtures/                            # Test data templates
-│   └── api/                                # API request body templates
-│       └── apiRequestBodies.ts
+│   ├── api/                                # API request body templates
+│   │   └── apiRequestBodies.ts
+│   └── stagehand.fixture.ts               # Stagehand AI automation fixture
 │
 ├── 🗂️ test-data/                          # Environment-based test data
 │   └── app.data.ts                         # Credentials & config
@@ -335,6 +349,75 @@ test('Admin can manage content', async ({ page }) => {
 - `loginAsSpeaker(page)` - Complete speaker login flow
 - `loginAsExhibitor(page)` - Complete exhibitor login flow
 - `loginWithCredentials(page, username, password)` - Custom credentials
+
+---
+
+### 🤖 Stagehand AI Automation
+
+The framework integrates [Stagehand](https://github.com/browserbase/stagehand) for AI-powered browser automation, enabling visual element recognition and natural language test commands.
+
+#### Architecture
+- **`page-objects/base.page.ts`**: Base page with Stagehand integration for all page objects
+- **`fixtures/stagehand.fixture.ts`**: Playwright fixture providing direct Stagehand access
+- **`tests/stagehand/`**: Dedicated AI automation test suite
+- **Environment Configuration**: LOCAL and BROWSERBASE environments supported
+
+#### Usage Examples
+
+**Page Object Integration:**
+```typescript
+import { LoginPage } from '../../page-objects/login.page';
+
+test('Login with AI automation', async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  
+  // Hybrid approach: Playwright + Stagehand
+  await loginPage.loginHybrid('admin@example.com', 'password123');
+  
+  // Pure Stagehand approach
+  await loginPage.loginWithStagehand('admin@example.com', 'password123');
+});
+```
+
+**Direct Fixture Usage:**
+```typescript
+import { test, expect } from '../../fixtures/stagehand.fixture';
+
+test('AI-powered navigation', async ({ page, stagehand }) => {
+  await stagehand.page.act("Navigate to login page");
+  await stagehand.page.act("Fill email with admin@example.com");
+  await stagehand.page.act("Fill password with password123");
+  await stagehand.page.act("Click login button");
+  
+  await expect(page).toHaveURL(/home/);
+});
+```
+
+**AI Methods:**
+- **`act()`**: Perform actions using natural language
+- **`observe()`**: Identify interactive elements on the page
+- **`extract()`**: Extract data from page elements
+
+#### Configuration
+Stagehand supports both LOCAL and BROWSERBASE environments. Configure via `.env`:
+
+```bash
+# Stagehand Configuration
+STAGEHAND_ENV=LOCAL                    # LOCAL or BROWSERBASE
+STAGEHAND_MODEL=gpt-4o                 # AI model to use
+OPENAI_API_KEY=your_openai_key         # Required for AI operations
+BROWSERBASE_API_KEY=your_bb_key        # Required for BROWSERBASE env
+BROWSERBASE_PROJECT_ID=your_project_id # Required for BROWSERBASE env
+```
+
+#### Test Commands
+```bash
+# Run Stagehand tests
+npm run test:stagehand
+
+# Run specific Stagehand project
+npx playwright test --project="Stagehand Tests"
+```
 
 ### Page Objects & Selectors
 - Prefer resilient, user-facing locators: `page.getByRole`, `page.getByLabel`, `page.getByText`, `page.getByTestId`
