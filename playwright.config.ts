@@ -150,5 +150,20 @@ export default defineConfig({
       },
       testMatch: 'tests/performance/**/*.spec.ts',
     },
+<<<<<<< Updated upstream
+=======
+
+    // ========== STAGEHAND TESTS ==========
+    {
+      name: 'Stagehand Tests',
+      dependencies: ['setup'],
+      use: { 
+        storageState: undefined,
+        trace: 'on', // Always trace Stagehand tests for debugging
+        video: 'retain-on-failure' // Keep video on failure for visual debugging
+      },
+      testMatch: 'tests/stagehand/**/*.spec.ts',
+    },
+>>>>>>> Stashed changes
   ],
 }); 
